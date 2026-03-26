@@ -1,5 +1,5 @@
 {
-  "name": "react-mindmap-app",
+  "name": "scorecard-app",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -9,10 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.0.0",
-    "@xyflow/react": "^12.0.0",
+    "i18next": "^24.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-i18next": "^15.0.0",
     "react-router-dom": "^7.5.0",
     "zustand": "^5.0.0"
   },

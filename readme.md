@@ -102,6 +102,7 @@ Pages are, except for links in certain situations, accessible via a hamburger me
 # To install dependencies but without using npm on the host machine (by design)
 # New dependencies can also be installed this way, after updating package.json
 podman run --rm -v $(pwd):/app:z -w /app node:22-alpine sh -c "npm install"
+#podman run -v $(pwd):/app:z -w /app node:22-alpine sh -c "npm install"
 
 # Security Audit can be executed using
 podman run --rm -v $(pwd):/app:z -w /app node:22-alpine sh -c "npm audit"
