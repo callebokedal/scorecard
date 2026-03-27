@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useClubsStore } from '../../store/clubs.store';
 
 /**
@@ -9,8 +10,8 @@ import { useClubsStore } from '../../store/clubs.store';
  * @param {import('../../types/models').Course} props.course
  */
 export function HoleTable({ clubId, course }) {
+  const { t } = useTranslation();
   const editCourse = useClubsStore((s) => s.editCourse);
-  // Local copy for editing
   const [holeInfo, setHoleInfo] = useState(course.holeInfo);
 
   const updateField = (holeNumber, field, value) => {
@@ -23,7 +24,9 @@ export function HoleTable({ clubId, course }) {
 
   const saveField = (holeNumber, field, value) => {
     const updated = holeInfo.map((h) =>
-      h.holeNumber === holeNumber ? { ...h, [field]: value === '' || value === null ? null : Number(value) } : h
+      h.holeNumber === holeNumber
+        ? { ...h, [field]: value === '' || value === null ? null : Number(value) }
+        : h
     );
     setHoleInfo(updated);
     editCourse(clubId, course.id, { holeInfo: updated });
@@ -34,10 +37,10 @@ export function HoleTable({ clubId, course }) {
       <table className="w-full text-sm min-w-[280px]">
         <thead>
           <tr className="bg-gray-100 text-gray-500 text-xs uppercase">
-            <th className="px-4 py-2 text-left w-10">#</th>
-            <th className="px-2 py-2 text-center">Par</th>
-            <th className="px-2 py-2 text-center">SI</th>
-            <th className="px-2 py-2 text-center">m</th>
+            <th className="px-4 py-2 text-left w-10">{t('clubs.holeTable.hole')}</th>
+            <th className="px-2 py-2 text-center">{t('clubs.holeTable.par')}</th>
+            <th className="px-2 py-2 text-center">{t('clubs.holeTable.si')}</th>
+            <th className="px-2 py-2 text-center">{t('clubs.holeTable.length')}</th>
           </tr>
         </thead>
         <tbody>
@@ -46,9 +49,7 @@ export function HoleTable({ clubId, course }) {
               <td className="px-4 py-1.5 font-medium text-gray-600">{hole.holeNumber}</td>
               <td className="px-2 py-1.5">
                 <input
-                  type="number"
-                  min={3}
-                  max={5}
+                  type="number" min={3} max={5}
                   className="w-14 text-center border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-green-500 bg-white"
                   value={hole.par ?? ''}
                   onChange={(e) => updateField(hole.holeNumber, 'par', e.target.value)}
@@ -57,9 +58,7 @@ export function HoleTable({ clubId, course }) {
               </td>
               <td className="px-2 py-1.5">
                 <input
-                  type="number"
-                  min={1}
-                  max={course.holes}
+                  type="number" min={1} max={course.holes}
                   className="w-14 text-center border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-green-500 bg-white"
                   value={hole.slopeIndex ?? ''}
                   onChange={(e) => updateField(hole.holeNumber, 'slopeIndex', e.target.value)}
@@ -68,8 +67,7 @@ export function HoleTable({ clubId, course }) {
               </td>
               <td className="px-2 py-1.5">
                 <input
-                  type="number"
-                  min={0}
+                  type="number" min={0}
                   className="w-16 text-center border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-green-500 bg-white"
                   value={hole.length ?? ''}
                   onChange={(e) => updateField(hole.holeNumber, 'length', e.target.value)}
@@ -82,7 +80,7 @@ export function HoleTable({ clubId, course }) {
         </tbody>
         <tfoot>
           <tr className="border-t border-gray-200 bg-gray-50 text-gray-600 font-medium text-xs">
-            <td className="px-4 py-1.5">Total</td>
+            <td className="px-4 py-1.5">{t('clubs.holeTable.total')}</td>
             <td className="px-2 py-1.5 text-center">
               {holeInfo.reduce((s, h) => s + (h.par ?? 0), 0)}
             </td>

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './i18n';
+import './store/settings.store'; // applies persisted theme + language before render
 import './index.css';
 
 createRoot(document.getElementById('root')).render(

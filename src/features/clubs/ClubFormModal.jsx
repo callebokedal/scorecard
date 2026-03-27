@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '../../components/common/Modal';
 import { useClubsStore } from '../../store/clubs.store';
 
@@ -9,6 +10,7 @@ import { useClubsStore } from '../../store/clubs.store';
  * @param {() => void} props.onClose
  */
 export function ClubFormModal({ club, onClose }) {
+  const { t } = useTranslation();
   const addClub = useClubsStore((s) => s.addClub);
   const editClub = useClubsStore((s) => s.editClub);
 
@@ -30,36 +32,36 @@ export function ClubFormModal({ club, onClose }) {
   };
 
   return (
-    <Modal title={isEditing ? 'Edit Club' : 'Add Club'} onClose={onClose}>
+    <Modal title={isEditing ? t('clubs.form.editTitle') : t('clubs.form.addTitle')} onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('clubs.form.name')}</label>
           <input
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Bro Hof Slott"
+            placeholder={t('clubs.form.namePlaceholder')}
             required
             autoFocus
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('clubs.form.address')}</label>
           <input
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            placeholder="e.g. Bro, Sweden"
+            placeholder={t('clubs.form.addressPlaceholder')}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Note</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('clubs.form.note')}</label>
           <textarea
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
             rows={2}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Optional note"
+            placeholder={t('common.optional')}
           />
         </div>
         <div className="flex gap-3 pt-1">
@@ -68,13 +70,13 @@ export function ClubFormModal({ club, onClose }) {
             onClick={onClose}
             className="flex-1 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             type="submit"
             className="flex-1 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700"
           >
-            {isEditing ? 'Save' : 'Add Club'}
+            {isEditing ? t('clubs.form.saveBtn') : t('clubs.form.addBtn')}
           </button>
         </div>
       </form>

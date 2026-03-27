@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useClubsStore } from '../store/clubs.store';
 import { TopNav } from '../components/layout/TopNav';
 import { CourseFormModal } from '../features/clubs/CourseFormModal';
@@ -7,6 +8,7 @@ import { HoleTable } from '../features/clubs/HoleTable';
 import { ClubFormModal } from '../features/clubs/ClubFormModal';
 
 export default function ClubDetailPage() {
+  const { t } = useTranslation();
   const { clubId } = useParams();
   const navigate = useNavigate();
   const clubs = useClubsStore((s) => s.clubs);
@@ -19,17 +21,20 @@ export default function ClubDetailPage() {
   const [editingCourse, setEditingCourse] = useState(null);
   const [editingClub, setEditingClub] = useState(false);
 
+  const backBtn = (
+    <button
+      onClick={() => navigate('/clubs')}
+      className="text-white text-xl leading-none px-1"
+      aria-label={t('common.back')}
+    >
+      ←
+    </button>
+  );
+
   if (!club) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
-        <TopNav
-          title="Club not found"
-          leftAction={
-            <button onClick={() => navigate('/clubs')} className="text-white text-xl leading-none px-1">
-              ←
-            </button>
-          }
-        />
+        <TopNav title={t('clubs.notFound')} leftAction={backBtn} />
       </div>
     );
   }
@@ -37,7 +42,7 @@ export default function ClubDetailPage() {
   const activeCourse = club.courses[activeTab] ?? null;
 
   const handleDeleteCourse = (course) => {
-    if (window.confirm(`Delete course "${course.name}"?`)) {
+    if (window.confirm(t('clubs.confirmDeleteCourse', { name: course.name }))) {
       removeCourse(club.id, course.id);
       setActiveTab(0);
     }
@@ -45,18 +50,7 @@ export default function ClubDetailPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <TopNav
-        title={club.name}
-        leftAction={
-          <button
-            onClick={() => navigate('/clubs')}
-            className="text-white text-xl leading-none px-1"
-            aria-label="Back"
-          >
-            ←
-          </button>
-        }
-      />
+      <TopNav title={club.name} leftAction={backBtn} />
 
       <main className="flex-1 max-w-lg mx-auto w-full">
         {/* Club info */}
@@ -69,7 +63,7 @@ export default function ClubDetailPage() {
             onClick={() => setEditingClub(true)}
             className="text-sm text-green-700 font-medium hover:underline ml-4 shrink-0"
           >
-            Edit club
+            {t('clubs.editClubBtn')}
           </button>
         </div>
 
@@ -92,7 +86,7 @@ export default function ClubDetailPage() {
             onClick={() => setShowAddCourse(true)}
             className="shrink-0 px-3 py-1.5 rounded-full text-sm font-medium bg-white border border-dashed border-gray-300 text-gray-500 hover:border-green-500 hover:text-green-600"
           >
-            + Add course
+            {t('clubs.addCourseBtn')}
           </button>
         </div>
 
@@ -102,7 +96,7 @@ export default function ClubDetailPage() {
             <div className="flex items-center justify-between mb-3">
               <div>
                 <span className="text-sm text-gray-500">
-                  {activeCourse.holes} holes · Slope {activeCourse.slope}
+                  {t('clubs.holesSlope', { holes: activeCourse.holes, slope: activeCourse.slope })}
                 </span>
                 {activeCourse.note && (
                   <p className="text-xs text-gray-400 italic mt-0.5">{activeCourse.note}</p>
@@ -113,13 +107,13 @@ export default function ClubDetailPage() {
                   onClick={() => setEditingCourse(activeCourse)}
                   className="text-sm text-green-700 font-medium hover:underline"
                 >
-                  Edit
+                  {t('common.edit')}
                 </button>
                 <button
                   onClick={() => handleDeleteCourse(activeCourse)}
                   className="text-sm text-red-500 font-medium hover:underline"
                 >
-                  Delete
+                  {t('common.delete')}
                 </button>
               </div>
             </div>
@@ -127,9 +121,9 @@ export default function ClubDetailPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Hole details
+                  {t('clubs.holeDetails')}
                 </span>
-                <span className="text-xs text-gray-400">SI = stroke index</span>
+                <span className="text-xs text-gray-400">{t('clubs.siHint')}</span>
               </div>
               <div className="px-4 py-2">
                 <HoleTable clubId={club.id} course={activeCourse} />
@@ -138,12 +132,12 @@ export default function ClubDetailPage() {
           </div>
         ) : (
           <div className="mt-8 text-center text-gray-400 text-sm">
-            No courses yet.{' '}
+            {t('clubs.noCourses')}{' '}
             <button
               onClick={() => setShowAddCourse(true)}
               className="text-green-600 font-medium hover:underline"
             >
-              Add one
+              {t('clubs.addOne')}
             </button>
           </div>
         )}
@@ -155,7 +149,7 @@ export default function ClubDetailPage() {
           course={null}
           onClose={() => {
             setShowAddCourse(false);
-            setActiveTab(club.courses.length); // switch to newly added tab
+            setActiveTab(club.courses.length);
           }}
         />
       )}

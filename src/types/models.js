@@ -72,8 +72,10 @@
  * @property {number|null} strokes - Gross strokes (null = not yet entered)
  * @property {number} putts
  * @property {TeeShot|null} teeShot - 'hit'|'left'|'right'|'long'|'short'|'miss'|null
+ * @property {boolean} skipped - true if the hole was deliberately skipped
  * @property {number} bunkersNearGreen
  * @property {number} bunkersFairway
+ * @property {number} bunkersOther
  * @property {number} penaltiesWater
  * @property {number} penaltiesOOB
  * @property {number} penaltiesOther

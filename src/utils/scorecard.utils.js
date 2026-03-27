@@ -7,10 +7,12 @@ export function createInitialHoleScores(holesPlayed) {
   return Array.from({ length: holesPlayed }, (_, i) => ({
     holeNumber: i + 1,
     strokes: null,
+    skipped: false,
     putts: 0,
     teeShot: null,
     bunkersNearGreen: 0,
     bunkersFairway: 0,
+    bunkersOther: 0,
     penaltiesWater: 0,
     penaltiesOOB: 0,
     penaltiesOther: 0,
@@ -71,4 +73,32 @@ export function formatDate(dateStr) {
  */
 export function todayISO() {
   return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Computes aggregated totals for a single scorecard player.
+ * @param {import('../types/models').ScorecardPlayer} scorecardPlayer
+ * @param {import('../types/models').Course|null} course
+ * @returns {{ totalStrokes: number, totalPoints: number, thru: number, playingHcp: number }}
+ */
+export function computePlayerTotals(scorecardPlayer, course) {
+  const playingHcp = course ? calcPlayingHcp(scorecardPlayer.hcp, course.slope) : 0;
+  let totalStrokes = 0;
+  let totalPoints = 0;
+  let thru = 0;
+
+  for (const hole of scorecardPlayer.holes) {
+    if (hole.strokes == null) continue;
+    thru = Math.max(thru, hole.holeNumber);
+    totalStrokes += hole.strokes;
+    if (course) {
+      const info = course.holeInfo.find((h) => h.holeNumber === hole.holeNumber);
+      if (info) {
+        const hcpStrokes = hcpStrokesOnHole(playingHcp, info.slopeIndex, course.holes);
+        totalPoints += calcStablefordPoints(hole.strokes, info.par, hcpStrokes);
+      }
+    }
+  }
+
+  return { totalStrokes, totalPoints, thru, playingHcp };
 }

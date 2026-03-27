@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '../../components/common/Modal';
 import { useClubsStore } from '../../store/clubs.store';
 import { usePlayersStore } from '../../store/players.store';
@@ -9,14 +10,14 @@ import { createInitialHoleScores, todayISO } from '../../utils/scorecard.utils';
  * Modal for creating a new scorecard.
  * @param {object} props
  * @param {() => void} props.onClose
- * @param {(id: string) => void} props.onCreated - Called with the new scorecard id
+ * @param {(id: string) => void} props.onCreated
  */
 export function ScorecardFormModal({ onClose, onCreated }) {
+  const { t } = useTranslation();
   const clubs = useClubsStore((s) => s.clubs);
   const players = usePlayersStore((s) => s.players);
   const addScorecard = useScorecardsStore((s) => s.addScorecard);
 
-  // All courses flattened: { courseId, courseName, clubName, holes, slope, holeInfo }
   const allCourses = clubs.flatMap((club) =>
     club.courses.map((course) => ({
       courseId: course.id,
@@ -28,13 +29,12 @@ export function ScorecardFormModal({ onClose, onCreated }) {
     }))
   );
 
-  const [courseId, setCourseId] = useState('');       // '' = No course
+  const [courseId, setCourseId] = useState('');
   const [name, setName] = useState('');
   const [date, setDate] = useState(todayISO());
   const [holesPlayed, setHolesPlayed] = useState(18);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
 
-  // Sync name and holes when course changes
   useEffect(() => {
     const course = allCourses.find((c) => c.courseId === courseId);
     if (course) {
@@ -84,24 +84,24 @@ export function ScorecardFormModal({ onClose, onCreated }) {
   };
 
   return (
-    <Modal title="New Scorecard" onClose={onClose}>
+    <Modal title={t('scorecards.form.title')} onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
-        {/* Course */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Course</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('scorecards.form.course')}
+          </label>
           <select
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             value={courseId}
             onChange={(e) => setCourseId(e.target.value)}
           >
-            <option value="">No course</option>
+            <option value="">{t('scorecards.form.noCourse')}</option>
             {clubs.map((club) =>
               club.courses.length > 0 ? (
                 <optgroup key={club.id} label={club.name}>
                   {club.courses.map((course) => (
                     <option key={course.id} value={course.id}>
-                      {course.name} ({course.holes} holes)
+                      {course.name} ({course.holes})
                     </option>
                   ))}
                 </optgroup>
@@ -110,22 +110,24 @@ export function ScorecardFormModal({ onClose, onCreated }) {
           </select>
         </div>
 
-        {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Round name *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('scorecards.form.roundName')}
+          </label>
           <input
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Saturday round"
+            placeholder={t('scorecards.form.roundNamePlaceholder')}
             required
           />
         </div>
 
-        {/* Date + Holes */}
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('scorecards.form.date')}
+            </label>
             <input
               type="date"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -134,7 +136,9 @@ export function ScorecardFormModal({ onClose, onCreated }) {
             />
           </div>
           <div className="w-24">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Holes</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('scorecards.form.holes')}
+            </label>
             <select
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               value={holesPlayed}
@@ -152,14 +156,14 @@ export function ScorecardFormModal({ onClose, onCreated }) {
           </div>
         </div>
 
-        {/* Players */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Players <span className="text-gray-400 font-normal">(max 4)</span>
+            {t('scorecards.form.players')}{' '}
+            <span className="text-gray-400 font-normal">{t('scorecards.form.maxPlayers')}</span>
           </label>
           {players.length === 0 ? (
             <p className="text-sm text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
-              No players registered yet. Add players first.
+              {t('scorecards.form.noPlayers')}
             </p>
           ) : (
             <ul className="flex flex-col gap-2">
@@ -187,7 +191,9 @@ export function ScorecardFormModal({ onClose, onCreated }) {
                       <span className="flex-1 text-sm font-medium text-gray-800">
                         {player.name}
                       </span>
-                      <span className="text-sm text-gray-400">HCP {Number(player.hcp).toFixed(1)}</span>
+                      <span className="text-sm text-gray-400">
+                        HCP {Number(player.hcp).toFixed(1)}
+                      </span>
                     </label>
                   </li>
                 );
@@ -202,14 +208,14 @@ export function ScorecardFormModal({ onClose, onCreated }) {
             onClick={onClose}
             className="flex-1 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             type="submit"
             disabled={!name.trim() || selectedPlayerIds.length === 0}
             className="flex-1 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Start Round
+            {t('scorecards.form.startBtn')}
           </button>
         </div>
       </form>
