@@ -1,26 +1,116 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { computePlayerTotals } from '../../utils/scorecard.utils';
+import {
+  computePlayerTotals,
+  calcPlayingHcp,
+  hcpStrokesOnHole,
+  calcStablefordPoints,
+} from '../../utils/scorecard.utils';
+
+/** @typedef {'auto'|'portrait'|'landscape'} OrientationMode */
+
+const ORIENTATION_CYCLE = { auto: 'landscape', landscape: 'portrait', portrait: 'auto' };
+const ORIENTATION_KEY = 'scorecard:leaderboard:orientation';
+
+function loadOrientation() {
+  try {
+    const v = localStorage.getItem(ORIENTATION_KEY);
+    return v === 'landscape' || v === 'portrait' ? v : 'auto';
+  } catch {
+    return 'auto';
+  }
+}
+
+const OrientationIcons = {
+  auto: (
+    // Rotate-cw (lucide)
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+      <polyline points="21 3 21 8 16 8"/>
+    </svg>
+  ),
+  portrait: (
+    // Phone standing
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2"/>
+      <line x1="12" y1="18" x2="12.01" y2="18"/>
+    </svg>
+  ),
+  landscape: (
+    // Phone on side
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="5" width="20" height="14" rx="2"/>
+      <line x1="18" y1="12" x2="18.01" y2="12"/>
+    </svg>
+  ),
+};
 
 /**
- * Leaderboard tab — compact portrait table, detailed landscape table.
+ * Leaderboard tab — portrait summary table + landscape per-hole table.
+ * Includes a manual orientation toggle.
  * @param {object} props
  * @param {import('../../types/models').Scorecard} props.scorecard
  * @param {import('../../types/models').Course|null} props.course
  */
 export function Leaderboard({ scorecard, course }) {
   const { t } = useTranslation();
+  const [orientation, setOrientation] = useState(/** @type {OrientationMode} */ (loadOrientation));
+
+  const cycleOrientation = () => {
+    setOrientation((prev) => {
+      const next = ORIENTATION_CYCLE[prev];
+      try {
+        localStorage.setItem(ORIENTATION_KEY, next);
+        if (next === 'portrait') screen.orientation?.lock('portrait-primary');
+        else if (next === 'landscape') screen.orientation?.lock('landscape-primary');
+        else screen.orientation?.unlock();
+      } catch (_) {}
+      return next;
+    });
+  };
+
+  // CSS visibility classes depending on forced vs auto mode
+  const portraitClass =
+    orientation === 'landscape' ? 'hidden'
+    : orientation === 'portrait'  ? 'block'
+    : 'block landscape:hidden';
+  const landscapeClass =
+    orientation === 'portrait'  ? 'hidden'
+    : orientation === 'landscape' ? 'block'
+    : 'hidden landscape:block';
+
+  const totalHoles = scorecard.holesPlayed <= 9 ? 9 : 18;
 
   const rows = scorecard.players
     .map((player) => {
       const totals = computePlayerTotals(player, course);
-      return { player, ...totals };
+      const playingHcp = course ? calcPlayingHcp(player.hcp, course.slope) : null;
+      return { player, ...totals, playingHcp };
     })
     .sort((a, b) => b.totalPoints - a.totalPoints || a.player.name.localeCompare(b.player.name));
 
+  const orientationLabel = {
+    auto: t('scorecard.orientationAuto'),
+    portrait: t('scorecard.orientationPortrait'),
+    landscape: t('scorecard.orientationLandscape'),
+  }[orientation];
+
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-5xl mx-auto">
+      {/* Orientation toggle */}
+      <div className="flex justify-end mb-3">
+        <button
+          type="button"
+          onClick={cycleOrientation}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 cursor-pointer transition-colors shadow-sm"
+        >
+          {OrientationIcons[orientation]}
+          {orientationLabel}
+        </button>
+      </div>
+
       {/* Compact portrait table */}
-      <div className="landscape:hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className={`${portraitClass} max-w-lg mx-auto bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden`}>
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
@@ -28,6 +118,7 @@ export function Leaderboard({ scorecard, course }) {
               <th className="px-3 py-2 text-left">{t('scorecard.lb.player')}</th>
               <th className="px-3 py-2 text-center">{t('scorecard.lb.score')}</th>
               <th className="px-3 py-2 text-center">{t('scorecard.lb.pts')}</th>
+              <th className="px-3 py-2 text-center">{t('scorecard.lb.hcpDiff')}</th>
               <th className="px-3 py-2 text-center">{t('scorecard.lb.thru')}</th>
             </tr>
           </thead>
@@ -42,10 +133,22 @@ export function Leaderboard({ scorecard, course }) {
                 <td className="px-3 py-2.5 text-center font-bold text-gray-900 tabular-nums">
                   {row.thru > 0 ? row.totalStrokes : '—'}
                 </td>
+                <td className="px-3 py-2.5 text-center font-bold tabular-nums text-green-700">
+                  {row.thru > 0 ? row.totalPoints : '—'}
+                </td>
                 <td className="px-3 py-2.5 text-center">
-                  <span className={`font-bold tabular-nums ${row.thru > 0 ? 'text-green-700' : 'text-gray-400'}`}>
-                    {row.thru > 0 ? row.totalPoints : '—'}
-                  </span>
+                  {row.thru > 0 ? (() => {
+                    const diff = row.totalPoints - row.thru * 2;
+                    return (
+                      <span className={`text-xs font-semibold tabular-nums px-1.5 py-0.5 rounded-full ${
+                        diff > 0 ? 'bg-green-100 text-green-700'
+                        : diff < 0 ? 'bg-red-100 text-red-500'
+                        : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {diff > 0 ? `+${diff}` : diff === 0 ? 'E' : diff}
+                      </span>
+                    );
+                  })() : <span className="text-gray-300">—</span>}
                 </td>
                 <td className="px-3 py-2.5 text-center text-gray-500 tabular-nums">
                   {row.thru > 0 ? row.thru : '—'}
@@ -57,12 +160,12 @@ export function Leaderboard({ scorecard, course }) {
       </div>
 
       {/* Detailed landscape table */}
-      <div className="hidden landscape:block overflow-x-auto">
+      <div className={`${landscapeClass} overflow-x-auto`}>
         <table className="text-xs bg-white rounded-xl shadow-sm border border-gray-100 w-full min-w-max">
           <thead>
             <tr className="bg-gray-50 text-gray-500 uppercase tracking-wide">
               <th className="px-3 py-2 text-left sticky left-0 bg-gray-50">
-                {t('scorecard.lb.player')}
+                {t('scorecard.lb.holes')}
               </th>
               {Array.from({ length: scorecard.holesPlayed }, (_, i) => (
                 <th key={i + 1} className="px-2 py-2 text-center w-10">{i + 1}</th>
@@ -70,31 +173,82 @@ export function Leaderboard({ scorecard, course }) {
               <th className="px-3 py-2 text-center">{t('scorecard.lb.tot')}</th>
               <th className="px-3 py-2 text-center">{t('scorecard.lb.pts')}</th>
             </tr>
+            <tr className="bg-gray-50 border-t border-gray-100 text-gray-500">
+              <td className="px-3 py-1 text-xs font-semibold sticky left-0 bg-gray-50">
+                {t('scorecard.lb.par')}
+              </td>
+              {Array.from({ length: scorecard.holesPlayed }, (_, i) => {
+                const info = course?.holeInfo.find((h) => h.holeNumber === i + 1);
+                return (
+                  <td key={i + 1} className="px-2 py-1 text-center text-xs font-medium tabular-nums">
+                    {info?.par ?? '—'}
+                  </td>
+                );
+              })}
+              <td className="px-3 py-1 text-center text-xs font-medium tabular-nums">
+                {course ? course.holeInfo.slice(0, scorecard.holesPlayed).reduce((s, h) => s + h.par, 0) : '—'}
+              </td>
+              <td />
+            </tr>
+            <tr className="bg-gray-50 border-t border-gray-100 text-gray-400">
+              <td className="px-3 py-1 text-xs font-semibold sticky left-0 bg-gray-50">
+                {t('scorecard.lb.si')}
+              </td>
+              {Array.from({ length: scorecard.holesPlayed }, (_, i) => {
+                const info = course?.holeInfo.find((h) => h.holeNumber === i + 1);
+                return (
+                  <td key={i + 1} className="px-2 py-1 text-center text-xs tabular-nums">
+                    {info?.slopeIndex ?? '—'}
+                  </td>
+                );
+              })}
+              <td colSpan={2} />
+            </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.player.playerId} className="border-t border-gray-100">
-                <td className="px-3 py-2 font-semibold text-gray-800 sticky left-0 bg-white">
-                  {row.player.name}
+                <td className="px-3 py-2 sticky left-0 bg-white">
+                  <div className="font-semibold text-gray-800">{row.player.name}</div>
+                  <div className="text-xs text-gray-400">
+                    HCP {Number(row.player.hcp).toFixed(1)}
+                    {row.playingHcp != null && (
+                      <span className="ml-1 text-gray-300">· {row.playingHcp}</span>
+                    )}
+                  </div>
                 </td>
                 {row.player.holes.map((hole) => {
                   const info = course?.holeInfo.find((h) => h.holeNumber === hole.holeNumber);
+                  const hcpStrokes = row.playingHcp != null && info
+                    ? hcpStrokesOnHole(row.playingHcp, info.slopeIndex, totalHoles)
+                    : 0;
                   const diff = info && hole.strokes != null ? hole.strokes - info.par : null;
+                  const points = hole.strokes != null && info
+                    ? calcStablefordPoints(hole.strokes, info.par, hcpStrokes)
+                    : null;
                   return (
-                    <td key={hole.holeNumber} className="px-2 py-2 text-center tabular-nums">
+                    <td key={hole.holeNumber} className="px-1 py-1.5 text-center tabular-nums">
                       {hole.strokes != null ? (
-                        <span
-                          className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
                             diff == null ? 'text-gray-600'
                               : diff <= -2 ? 'bg-yellow-400 text-white'
                               : diff === -1 ? 'bg-red-500 text-white'
                               : diff === 0 ? 'text-gray-700'
                               : diff === 1 ? 'border border-gray-400 text-gray-600'
                               : 'border-2 border-gray-400 text-gray-500'
-                          }`}
-                        >
-                          {hole.strokes}
-                        </span>
+                          }`}>
+                            {hole.strokes}
+                          </span>
+                          <span className="text-[10px] font-medium text-green-600 leading-none">
+                            {points ?? 0}p
+                          </span>
+                          {hcpStrokes > 0 && (
+                            <span className="text-[9px] text-gray-400 leading-none">
+                              {'·'.repeat(hcpStrokes)}
+                            </span>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-gray-300">—</span>
                       )}

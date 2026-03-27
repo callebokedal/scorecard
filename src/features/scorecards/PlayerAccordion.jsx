@@ -17,6 +17,7 @@ import {
  * @param {boolean} props.expanded
  * @param {() => void} props.onToggle
  * @param {(updates: Partial<import('../../types/models').HoleScore>) => void} props.onChange
+ * @param {boolean} [props.hasMissingScores]
  */
 export function PlayerAccordion({
   player,
@@ -26,6 +27,7 @@ export function PlayerAccordion({
   expanded,
   onToggle,
   onChange,
+  hasMissingScores,
 }) {
   const [quickEntryOpen, setQuickEntryOpen] = useState(false);
 
@@ -53,6 +55,9 @@ export function PlayerAccordion({
         >
           <div className="flex items-center gap-2 min-w-0">
             <span className="font-semibold text-white truncate">{player.name}</span>
+            {hasMissingScores && (
+              <svg className="shrink-0 text-amber-300" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            )}
             {hcpStrokes > 0 && (
               <span className="shrink-0 text-xs bg-white/20 text-white font-medium px-1.5 py-0.5 rounded-full">
                 +{hcpStrokes}

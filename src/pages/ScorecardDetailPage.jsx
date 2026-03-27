@@ -53,6 +53,20 @@ export default function ScorecardDetailPage() {
     p.holes.every((h) => h.strokes != null)
   );
 
+  // A hole score is "missing" when strokes is null and not deliberately skipped.
+  // Only warn once scoring has actually started on any hole.
+  const scoringStarted = sc.players.some((p) =>
+    p.holes.some((h) => h.strokes !== null || h.skipped)
+  );
+  const playerMissingMap = Object.fromEntries(
+    sc.players.map((p) => [
+      p.playerId,
+      scoringStarted &&
+        p.holes.some((h) => h.holeNumber < currentHole && h.strokes === null && !h.skipped),
+    ])
+  );
+  const anyMissingPrev = Object.values(playerMissingMap).some(Boolean);
+
   const handleHoleChange = (updates, playerId) => {
     updateHoleScore(sc.id, playerId, currentHole, updates);
   };
@@ -92,6 +106,7 @@ export default function ScorecardDetailPage() {
             holeInfo={holeInfo}
             onPrev={() => setCurrentHole((h) => Math.max(1, h - 1))}
             onNext={() => setCurrentHole((h) => Math.min(sc.holesPlayed, h + 1))}
+            hasMissingScores={anyMissingPrev}
           />
 
           <div className="flex-1 overflow-y-auto">
@@ -108,6 +123,7 @@ export default function ScorecardDetailPage() {
                     expanded={expandedPlayerId === player.playerId}
                     onToggle={() => togglePlayer(player.playerId)}
                     onChange={(updates) => handleHoleChange(updates, player.playerId)}
+                    hasMissingScores={playerMissingMap[player.playerId]}
                   />
                 );
               })}
@@ -134,7 +150,7 @@ export default function ScorecardDetailPage() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto max-w-lg mx-auto w-full">
+        <div className="flex-1 overflow-y-auto w-full">
           <Leaderboard scorecard={sc} course={course} />
         </div>
       )}

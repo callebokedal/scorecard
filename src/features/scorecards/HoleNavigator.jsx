@@ -8,8 +8,9 @@ import { useTranslation } from 'react-i18next';
  * @param {import('../../types/models').HoleInfo|null} props.holeInfo
  * @param {() => void} props.onPrev
  * @param {() => void} props.onNext
+ * @param {boolean} [props.hasMissingScores]
  */
-export function HoleNavigator({ currentHole, totalHoles, holeInfo, onPrev, onNext }) {
+export function HoleNavigator({ currentHole, totalHoles, holeInfo, onPrev, onNext, hasMissingScores }) {
   const { t } = useTranslation();
 
   return (
@@ -45,6 +46,12 @@ export function HoleNavigator({ currentHole, totalHoles, holeInfo, onPrev, onNex
         <div className="text-xs text-gray-400 mt-0.5">
           {t('scorecard.holeFraction', { current: currentHole, total: totalHoles })}
         </div>
+        {hasMissingScores && (
+          <div className="flex items-center justify-center gap-1 mt-1 text-amber-500 text-xs">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            {t('scorecard.missingPrevScores')}
+          </div>
+        )}
       </div>
 
       <button
