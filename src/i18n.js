@@ -155,6 +155,8 @@ const resources = {
           tot: 'Tot',
           par: 'Par',
           si: 'SI',
+          gross: 'Gross',
+          net: 'Net',
         },
       },
       settings: {
@@ -328,6 +330,8 @@ const resources = {
           tot: 'Tot',
           par: 'Par',
           si: 'SI',
+          gross: 'Brutto',
+          net: 'Netto',
         },
       },
       settings: {

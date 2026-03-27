@@ -11,6 +11,7 @@ import {
 
 const ORIENTATION_CYCLE = { auto: 'landscape', landscape: 'portrait', portrait: 'auto' };
 const ORIENTATION_KEY = 'scorecard:leaderboard:orientation';
+const NET_VIEW_KEY = 'scorecard:leaderboard:netView';
 
 function loadOrientation() {
   try {
@@ -18,6 +19,14 @@ function loadOrientation() {
     return v === 'landscape' || v === 'portrait' ? v : 'auto';
   } catch {
     return 'auto';
+  }
+}
+
+function loadNetView() {
+  try {
+    return localStorage.getItem(NET_VIEW_KEY) === 'true';
+  } catch {
+    return false;
   }
 }
 
@@ -55,6 +64,7 @@ const OrientationIcons = {
 export function Leaderboard({ scorecard, course }) {
   const { t } = useTranslation();
   const [orientation, setOrientation] = useState(/** @type {OrientationMode} */ (loadOrientation));
+  const [netView, setNetView] = useState(loadNetView);
 
   const cycleOrientation = () => {
     setOrientation((prev) => {
@@ -89,6 +99,14 @@ export function Leaderboard({ scorecard, course }) {
     })
     .sort((a, b) => b.totalPoints - a.totalPoints || a.player.name.localeCompare(b.player.name));
 
+  const toggleNetView = () => {
+    setNetView((prev) => {
+      const next = !prev;
+      try { localStorage.setItem(NET_VIEW_KEY, String(next)); } catch (_) {}
+      return next;
+    });
+  };
+
   const orientationLabel = {
     auto: t('scorecard.orientationAuto'),
     portrait: t('scorecard.orientationPortrait'),
@@ -97,8 +115,19 @@ export function Leaderboard({ scorecard, course }) {
 
   return (
     <div className="p-4 max-w-5xl mx-auto">
-      {/* Orientation toggle */}
-      <div className="flex justify-end mb-3">
+      {/* Toolbar */}
+      <div className="flex justify-end gap-2 mb-3">
+        <button
+          type="button"
+          onClick={toggleNetView}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition-colors shadow-sm ${
+            netView
+              ? 'bg-green-700 border-green-700 text-white hover:bg-green-800'
+              : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          {netView ? t('scorecard.lb.net') : t('scorecard.lb.gross')}
+        </button>
         <button
           type="button"
           onClick={cycleOrientation}
@@ -172,6 +201,8 @@ export function Leaderboard({ scorecard, course }) {
               ))}
               <th className="px-3 py-2 text-center">{t('scorecard.lb.tot')}</th>
               <th className="px-3 py-2 text-center">{t('scorecard.lb.pts')}</th>
+              <th className="px-3 py-2 text-center">{t('scorecard.lb.hcpDiff')}</th>
+              <th className="px-3 py-2 text-center">{t('scorecard.lb.thru')}</th>
             </tr>
             <tr className="bg-gray-50 border-t border-gray-100 text-gray-500">
               <td className="px-3 py-1 text-xs font-semibold sticky left-0 bg-gray-50">
@@ -188,7 +219,7 @@ export function Leaderboard({ scorecard, course }) {
               <td className="px-3 py-1 text-center text-xs font-medium tabular-nums">
                 {course ? course.holeInfo.slice(0, scorecard.holesPlayed).reduce((s, h) => s + h.par, 0) : '—'}
               </td>
-              <td />
+              <td colSpan={3} />
             </tr>
             <tr className="bg-gray-50 border-t border-gray-100 text-gray-400">
               <td className="px-3 py-1 text-xs font-semibold sticky left-0 bg-gray-50">
@@ -202,14 +233,19 @@ export function Leaderboard({ scorecard, course }) {
                   </td>
                 );
               })}
-              <td colSpan={2} />
+              <td colSpan={4} />
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {rows.map((row, idx) => {
+              const hcpDiff = row.thru > 0 ? row.totalPoints - row.thru * 2 : null;
+              return (
               <tr key={row.player.playerId} className="border-t border-gray-100">
                 <td className="px-3 py-2 sticky left-0 bg-white">
-                  <div className="font-semibold text-gray-800">{row.player.name}</div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xs text-gray-400 font-medium tabular-nums">{idx + 1}</span>
+                    <span className="font-semibold text-gray-800">{row.player.name}</span>
+                  </div>
                   <div className="text-xs text-gray-400">
                     HCP {Number(row.player.hcp).toFixed(1)}
                     {row.playingHcp != null && (
@@ -223,6 +259,7 @@ export function Leaderboard({ scorecard, course }) {
                     ? hcpStrokesOnHole(row.playingHcp, info.slopeIndex, totalHoles)
                     : 0;
                   const diff = info && hole.strokes != null ? hole.strokes - info.par : null;
+                  const displayDiff = netView && diff != null ? diff - hcpStrokes : diff;
                   const points = hole.strokes != null && info
                     ? calcStablefordPoints(hole.strokes, info.par, hcpStrokes)
                     : null;
@@ -230,21 +267,23 @@ export function Leaderboard({ scorecard, course }) {
                     <td key={hole.holeNumber} className="px-1 py-1.5 text-center tabular-nums">
                       {hole.strokes != null ? (
                         <div className="flex flex-col items-center gap-0.5">
-                          <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                            diff == null ? 'text-gray-600'
-                              : diff <= -2 ? 'bg-yellow-400 text-white'
-                              : diff === -1 ? 'bg-red-500 text-white'
-                              : diff === 0 ? 'text-gray-700'
-                              : diff === 1 ? 'border border-gray-400 text-gray-600'
-                              : 'border-2 border-gray-400 text-gray-500'
+                          <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-bold ${
+                            displayDiff == null  ? 'text-gray-500'
+                            : displayDiff <= -3  ? 'rounded-full bg-green-600 text-white ring-2 ring-green-700 ring-offset-1'
+                            : displayDiff === -2 ? 'rounded-full bg-green-600 text-white ring-2 ring-green-700 ring-offset-1'
+                            : displayDiff === -1 ? 'rounded-full bg-green-600 text-white'
+                            : displayDiff === 0  ? 'text-gray-800'
+                            : displayDiff === 1  ? 'border-2 border-gray-800 text-gray-800'
+                            : displayDiff === 2  ? 'border-2 border-gray-800 text-gray-800 ring-2 ring-gray-800 ring-offset-1'
+                            :                     'bg-gray-800 text-white ring-2 ring-gray-800 ring-offset-1'
                           }`}>
                             {hole.strokes}
                           </span>
-                          <span className="text-[10px] font-medium text-green-600 leading-none">
+                          <span className="text-[10px] mt-1 font-medium text-green-700 leading-none">
                             {points ?? 0}p
                           </span>
                           {hcpStrokes > 0 && (
-                            <span className="text-[9px] text-gray-400 leading-none">
+                            <span className="text-[10px] text-gray-400 leading-none">
                               {'·'.repeat(hcpStrokes)}
                             </span>
                           )}
@@ -261,8 +300,23 @@ export function Leaderboard({ scorecard, course }) {
                 <td className="px-3 py-2 text-center font-bold tabular-nums text-green-700">
                   {row.thru > 0 ? row.totalPoints : '—'}
                 </td>
+                <td className="px-3 py-2 text-center">
+                  {hcpDiff != null ? (
+                    <span className={`text-xs font-semibold tabular-nums px-1.5 py-0.5 rounded-full ${
+                      hcpDiff > 0 ? 'bg-green-100 text-green-700'
+                      : hcpDiff < 0 ? 'bg-red-100 text-red-500'
+                      : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {hcpDiff > 0 ? `+${hcpDiff}` : hcpDiff === 0 ? 'E' : hcpDiff}
+                    </span>
+                  ) : <span className="text-gray-300">—</span>}
+                </td>
+                <td className="px-3 py-2 text-center text-gray-500 tabular-nums">
+                  {row.thru > 0 ? row.thru : '—'}
+                </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

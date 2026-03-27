@@ -61,26 +61,39 @@ Pages are, except for links in certain situations, accessible via a hamburger me
 - List of scorecards
 - For selected scorecard:
     - Tab: "Scorecard" - for managing the current round (default tab for ongoing games)
-        - I think I want this area to look like this:
-            - Top Nav: back arrow - Name of course + date - menu to the right
-            - Main area:
-                - Prev hole arrow - "Hole <num> - <par> <slope> - Next hole arrow
-                - Accordion for each player: <Player name> - HCP - current total strokes - current total points
-                - Accordion body (details for this hole):
-                    - "Score" (+) <strokes> (-) and calculated Stableford points for this hole [<- Note: elements in vertical order]
-                    - "Putts" (+) <score> (-) [<- Note: elements in vertical order]
-                    - "Tee shot" (left/long/short/right/hit) [Rounded 5-way navigator with "Hit" in the middle]
-                        - Also a round "miss" at the bottom/side of this 5-way navigator
-                    - "Bunkers" (near green) (on fairway) [<- Title at top, icon buttons below]
-                    - "Penalties" (water) (out of bounds) (other) [<- Title at top, icon buttons below]
+        - **Hole navigator** at the top: prev/next arrows, current hole number, Par, SI (stroke index) and length (if set). An amber warning is shown if scores are missing on earlier holes.
+        - **Player accordions** (one per player, green header):
+            - Header shows: player name, HCP strokes awarded on this hole (if any), current strokes and Stableford points for the hole, a ✏ quick-entry button
+            - Tap the header to expand/collapse the detail form
+            - The ✏ button opens a **quick score numpad** (without expanding the accordion): tap 1–9 for the stroke count, `10+` for higher scores (10–25), `Clear` to remove the score, or the ✕ button to mark the hole as skipped
+        - **Hole detail form** (expanded accordion body):
+            - **Score**: +/− counter with Stableford points shown; ✕ button to skip the hole
+            - **Putts**: +/− counter
+            - **Tee shot**: circular D-pad navigator (Long / Left / Right / Short / Hit in the middle); club selector button opens a modal to pick the club used (Woods, Hybrids, Irons); Miss button marks a missed tee shot
+            - **Bunkers**: separate counters for near-green bunkers, fairway bunkers and other
+            - **Penalties**: counters for Water, OOB and Other
+        - A **Mark Round as Complete** button appears once all holes are entered; completed rounds can be reopened
 
     - Tab: "Leaderboard" - showing current stats (default tab for completed games)
-        - Quite compact info list if in vertical mode
-            - Table of players sorted by score, then name
-            - Each row should contain
-                - Idx, Name (HCP on row below), Score, Points, Thru (at what hole)
-        - Detailed info table in landscape mode
-            - Detailed statitics for all holes and players
+        - **Toolbar** (top-right): Net/Gross toggle and orientation toggle
+        - **Compact portrait table** (default / portrait mode):
+            - Players sorted by Stableford points (descending), then name
+            - Columns: Rank, Name (HCP below), Strokes, Points, HCP diff (+/− vs expected 2p/hole as a coloured badge), Thru (holes completed)
+        - **Detailed landscape table** (landscape mode):
+            - One column per hole played, plus totals
+            - Header rows: Par per hole, Slope Index per hole
+            - Each player row shows: name + HCP + playing HCP, per-hole strokes with golf scoring notation (see below), Stableford points per hole, HCP strokes as dots (·), total strokes and total points
+        - **Orientation toggle**: cycles Auto → Landscape → Portrait; choice is remembered across sessions
+        - **Net / Gross toggle**: controls the scoring shapes in the landscape table
+            - **Gross** (default): shapes reflect strokes vs par (standard golf notation)
+            - **Net**: shapes reflect strokes vs par adjusted for HCP strokes — a bogey on a hole where you receive an extra stroke shows as par; friendlier view for higher-HCP players
+        - **Golf scoring notation** (landscape table):
+            - Double circle (green filled) = Eagle or better (−2 or less)
+            - Single circle (green filled) = Birdie (−1)
+            - Plain number = Par (0)
+            - Single square = Bogey (+1)
+            - Double square = Double bogey (+2)
+            - Filled double square = Triple bogey or worse (+3 or more)
 - Statistics per Player
 - Statistics per scorecard
 - Settings
