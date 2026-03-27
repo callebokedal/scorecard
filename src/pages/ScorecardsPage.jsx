@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useScorecardsStore } from '../store/scorecards.store';
+import { useClubsStore } from '../store/clubs.store';
 import { ScorecardFormModal } from '../features/scorecards/ScorecardFormModal';
 import { formatDate } from '../utils/scorecard.utils';
 import { exportJSON } from '../services/importExport.service';
@@ -10,6 +11,7 @@ export default function ScorecardsPage() {
   const { t } = useTranslation();
   const scorecards = useScorecardsStore((s) => s.scorecards);
   const removeScorecard = useScorecardsStore((s) => s.removeScorecard);
+  const clubs = useClubsStore((s) => s.clubs);
   const navigate = useNavigate();
 
   const [showCreate, setShowCreate] = useState(false);
@@ -44,6 +46,18 @@ export default function ScorecardsPage() {
           {t('scorecards.newRound')}
         </button>
       </div>
+
+      {clubs.length === 0 && (
+        <div className="mb-4 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800">
+          {t('scorecards.noClubs')}{' '}
+          <button
+            onClick={() => navigate('/clubs')}
+            className="font-semibold underline hover:text-amber-900"
+          >
+            {t('scorecards.goToClubs')}
+          </button>
+        </div>
+      )}
 
       {scorecards.length === 0 ? (
         <div className="text-center mt-20">
