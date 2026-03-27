@@ -10,6 +10,7 @@ const resources = {
         players: 'Players',
         scorecards: 'Scorecards',
         settings: 'Settings',
+        help: 'Help',
       },
       common: {
         edit: 'Edit',
@@ -181,6 +182,36 @@ const resources = {
           net: 'Net',
         },
       },
+      help: {
+        sourceCode: 'Source code',
+        gettingStarted: {
+          title: 'Getting started',
+          body: 'Set up clubs and players before starting a round.',
+          step1: 'Add a club and at least one course under Clubs',
+          step2: 'Add players under Players',
+          step3: 'Start a new round under Scorecards',
+        },
+        scoring: {
+          title: 'Scoring',
+          body: 'Enter strokes and putts for each hole. Tap the score number to open the quick-entry pad. Stableford points are calculated automatically based on each player\'s HCP and the course slope. Mark a hole as skipped (✕) to leave it out of totals.',
+        },
+        teeShot: {
+          title: 'Tee shot',
+          body: 'Use the D-pad to record where the tee shot landed (Hit, Long, Short, Left, Right) or mark it as a Miss. Select the club used with the club button.',
+        },
+        leaderboard: {
+          title: 'Leaderboard',
+          body: 'Switch between portrait (summary) and landscape (per-hole detail) views. Toggle Net/Gross to adjust scores by handicap. Per-hole cells show stroke count, Stableford points, and HCP dots.',
+        },
+        stats: {
+          title: 'Statistics',
+          body: 'View aggregated per-player stats for the round: scoring, average putts, tee shot directions per club, bunkers, and penalties.',
+        },
+        importExport: {
+          title: 'Import & Export',
+          body: 'Each club, course, player, and scorecard can be exported as JSON from its list or detail page. Import single items or full backups via Settings or the Import button on the Clubs page.',
+        },
+      },
       settings: {
         title: 'Settings',
         language: 'Language',
@@ -208,6 +239,7 @@ const resources = {
         players: 'Spelare',
         scorecards: 'Scorekort',
         settings: 'Inställningar',
+        help: 'Hjälp',
       },
       common: {
         edit: 'Redigera',
@@ -334,7 +366,7 @@ const resources = {
         bunkers: 'Bunkrar',
         nearGreen: 'Nära green',
         fairway: 'Fairway',
-        penalties: 'Straff',
+        penalties: 'Plikt',
         water: 'Vatten',
         oob: 'OB',
         other: 'Övrigt',
@@ -377,6 +409,36 @@ const resources = {
           si: 'SI',
           gross: 'Brutto',
           net: 'Netto',
+        },
+      },
+      help: {
+        sourceCode: 'Källkod',
+        gettingStarted: {
+          title: 'Kom igång',
+          body: 'Lägg till klubbar och spelare innan du startar en runda.',
+          step1: 'Lägg till en klubb och minst en bana under Klubbar',
+          step2: 'Lägg till spelare under Spelare',
+          step3: 'Starta en ny runda under Scorekort',
+        },
+        scoring: {
+          title: 'Registrera slag',
+          body: 'Ange slag och puttar per hål. Tryck på siffran för att öppna snabbinmatning. Stablefordpoäng beräknas automatiskt utifrån spelarens HCP och banans slope. Markera ett hål som hoppat över (✕) för att utesluta det ur totalen.',
+        },
+        teeShot: {
+          title: 'Utslag',
+          body: 'Använd D-paden för att registrera var utslagets landade (Träff, Lång, Kort, Vänster, Höger) eller markera det som en miss. Välj klubba med klubbknappen.',
+        },
+        leaderboard: {
+          title: 'Ledartavla',
+          body: 'Växla mellan stående (sammanfattning) och liggande (hål-för-hål) vy. Toggla Netto/Brutto för att justera poäng efter handicap. Varje hålcell visar slag, Stablefordpoäng och HCP-prickar.',
+        },
+        stats: {
+          title: 'Statistik',
+          body: 'Visa aggregerad statistik per spelare för rundan: slag, snittputtar, utslagens riktning per klubba, bunkrar och plikt.',
+        },
+        importExport: {
+          title: 'Import & Export',
+          body: 'Varje klubb, bana, spelare och scorekort kan exporteras som JSON från sin list- eller detaljsida. Importera enstaka objekt eller fullständiga säkerhetskopior via Inställningar eller importknappen på Klubbar-sidan.',
         },
       },
       settings: {

@@ -18,6 +18,7 @@ export function TopNav({ title, leftAction }) {
     { label: t('nav.players'), path: '/players' },
     { label: t('nav.scorecards'), path: '/scorecards' },
     { label: t('nav.settings'), path: '/settings' },
+    { label: t('nav.help'), path: '/help' },
   ];
 
   const handleNav = (path) => {

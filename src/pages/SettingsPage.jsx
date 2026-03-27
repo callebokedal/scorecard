@@ -29,7 +29,10 @@ export default function SettingsPage() {
         />
       </Section>
 
+        {/*
+
       {/* Theme */}
+      {false && (
       <Section title={t('settings.theme')}>
         <SegmentedControl
           options={[
@@ -45,9 +48,10 @@ export default function SettingsPage() {
           </p>
         )}
       </Section>
+      )}
 
       {/* Data – Clubs */}
-      <Section title="Clubs">
+      {false && (<Section title="Clubs">
         <DataRow
           label={t('settings.exportClubs')}
           onExportJSON={() => exportJSON(loadClubs(), 'scorecard-clubs')}
@@ -61,9 +65,10 @@ export default function SettingsPage() {
           entity={t('nav.clubs').toLowerCase()}
         />
       </Section>
+      )}
 
       {/* Data – Players */}
-      <Section title="Players">
+      {false && (<Section title="Players">
         <DataRow
           label={t('settings.exportPlayers')}
           onExportJSON={() => exportJSON(loadPlayers(), 'scorecard-players')}
@@ -77,6 +82,7 @@ export default function SettingsPage() {
           entity={t('nav.players').toLowerCase()}
         />
       </Section>
+      )}
 
       {/* Data – Scorecards */}
       <Section title="Scorecards">

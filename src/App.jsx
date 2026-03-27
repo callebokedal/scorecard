@@ -6,6 +6,7 @@ import ScorecardDetailPage from './pages/ScorecardDetailPage';
 import PlayersPage from './pages/PlayersPage';
 import ScorecardsPage from './pages/ScorecardsPage';
 import SettingsPage from './pages/SettingsPage';
+import HelpPage from './pages/HelpPage';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/players" element={<PlayersPage />} />
         <Route path="/scorecards" element={<ScorecardsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/help" element={<HelpPage />} />
       </Route>
     </Routes>
   );
