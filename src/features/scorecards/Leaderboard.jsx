@@ -196,9 +196,10 @@ export function Leaderboard({ scorecard, course }) {
               <th className="px-3 py-2 text-left sticky left-0 bg-gray-50">
                 {t('scorecard.lb.holes')}
               </th>
-              {Array.from({ length: scorecard.holesPlayed }, (_, i) => (
-                <th key={i + 1} className="px-2 py-2 text-center w-10">{i + 1}</th>
-              ))}
+              {Array.from({ length: scorecard.holesPlayed }, (_, i) => {
+                const holeNum = (scorecard.startHole ?? 1) + i;
+                return <th key={holeNum} className="px-2 py-2 text-center w-10">{holeNum}</th>;
+              })}
               <th className="px-3 py-2 text-center">{t('scorecard.lb.tot')}</th>
               <th className="px-3 py-2 text-center">{t('scorecard.lb.pts')}</th>
               <th className="px-3 py-2 text-center">{t('scorecard.lb.hcpDiff')}</th>
@@ -209,15 +210,21 @@ export function Leaderboard({ scorecard, course }) {
                 {t('scorecard.lb.par')}
               </td>
               {Array.from({ length: scorecard.holesPlayed }, (_, i) => {
-                const info = course?.holeInfo.find((h) => h.holeNumber === i + 1);
+                const holeNum = (scorecard.startHole ?? 1) + i;
+                const info = course?.holeInfo.find((h) => h.holeNumber === holeNum);
                 return (
-                  <td key={i + 1} className="px-2 py-1 text-center text-xs font-medium tabular-nums">
+                  <td key={holeNum} className="px-2 py-1 text-center text-xs font-medium tabular-nums">
                     {info?.par ?? '—'}
                   </td>
                 );
               })}
               <td className="px-3 py-1 text-center text-xs font-medium tabular-nums">
-                {course ? course.holeInfo.slice(0, scorecard.holesPlayed).reduce((s, h) => s + h.par, 0) : '—'}
+                {course ? (() => {
+                  const startHole = scorecard.startHole ?? 1;
+                  return course.holeInfo
+                    .filter((h) => h.holeNumber >= startHole && h.holeNumber < startHole + scorecard.holesPlayed)
+                    .reduce((s, h) => s + h.par, 0);
+                })() : '—'}
               </td>
               <td colSpan={3} />
             </tr>
@@ -226,9 +233,10 @@ export function Leaderboard({ scorecard, course }) {
                 {t('scorecard.lb.si')}
               </td>
               {Array.from({ length: scorecard.holesPlayed }, (_, i) => {
-                const info = course?.holeInfo.find((h) => h.holeNumber === i + 1);
+                const holeNum = (scorecard.startHole ?? 1) + i;
+                const info = course?.holeInfo.find((h) => h.holeNumber === holeNum);
                 return (
-                  <td key={i + 1} className="px-2 py-1 text-center text-xs tabular-nums">
+                  <td key={holeNum} className="px-2 py-1 text-center text-xs tabular-nums">
                     {info?.slopeIndex ?? '—'}
                   </td>
                 );

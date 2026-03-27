@@ -1,11 +1,12 @@
 /**
  * Creates an empty HoleScore array for the given number of holes.
  * @param {number} holesPlayed
+ * @param {number} [startHole=1] - First hole number (use 10 for back 9)
  * @returns {import('../types/models').HoleScore[]}
  */
-export function createInitialHoleScores(holesPlayed) {
+export function createInitialHoleScores(holesPlayed, startHole = 1) {
   return Array.from({ length: holesPlayed }, (_, i) => ({
-    holeNumber: i + 1,
+    holeNumber: startHole + i,
     strokes: null,
     skipped: false,
     putts: 0,

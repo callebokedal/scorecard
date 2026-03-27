@@ -1,0 +1,138 @@
+{
+  "id": "44192c30-8f90-4336-9047-7871849a7e06",
+  "clubId": "927e6c3a-8930-4bb7-ad5d-2bb3bba9dc4e",
+  "holeInfo": [
+    {
+      "holeNumber": 1,
+      "par": 4,
+      "slopeIndex": 13,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 2,
+      "par": 5,
+      "slopeIndex": 3,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 3,
+      "par": 3,
+      "slopeIndex": 17,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 4,
+      "par": 4,
+      "slopeIndex": 11,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 5,
+      "par": 5,
+      "slopeIndex": 9,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 6,
+      "par": 4,
+      "slopeIndex": 7,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 7,
+      "par": 3,
+      "slopeIndex": 15,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 8,
+      "par": 4,
+      "slopeIndex": 5,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 9,
+      "par": 4,
+      "slopeIndex": 1,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 10,
+      "par": 5,
+      "slopeIndex": 10,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 11,
+      "par": 3,
+      "slopeIndex": 16,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 12,
+      "par": 4,
+      "slopeIndex": 4,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 13,
+      "par": 4,
+      "slopeIndex": 12,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 14,
+      "par": 4,
+      "slopeIndex": 2,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 15,
+      "par": 4,
+      "slopeIndex": 8,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 16,
+      "par": 4,
+      "slopeIndex": 14,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 17,
+      "par": 3,
+      "slopeIndex": 18,
+      "length": null,
+      "note": ""
+    },
+    {
+      "holeNumber": 18,
+      "par": 5,
+      "slopeIndex": 6,
+      "length": null,
+      "note": ""
+    }
+  ],
+  "createdAt": "2026-03-26T00:46:44.324Z",
+  "updatedAt": "2026-03-27T12:30:47.706Z",
+  "name": "Mölndal",
+  "holes": 18,
+  "slope": 113,
+  "note": ""
+}

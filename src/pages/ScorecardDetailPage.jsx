@@ -21,7 +21,9 @@ export default function ScorecardDetailPage() {
 
   const sc = scorecards.find((s) => s.id === scorecardId);
 
-  const [currentHole, setCurrentHole] = useState(1);
+  const firstHole = sc?.startHole ?? 1;
+  const lastHole = firstHole + (sc?.holesPlayed ?? 1) - 1;
+  const [currentHole, setCurrentHole] = useState(firstHole);
   const [activeTab, setActiveTab] = useState(sc?.completed ? 1 : 0);
   const [expandedPlayerId, setExpandedPlayerId] = useState(sc?.players[0]?.playerId ?? null);
 
@@ -102,10 +104,12 @@ export default function ScorecardDetailPage() {
         <div className="flex-1 flex flex-col">
           <HoleNavigator
             currentHole={currentHole}
+            firstHole={firstHole}
+            lastHole={lastHole}
             totalHoles={sc.holesPlayed}
             holeInfo={holeInfo}
-            onPrev={() => setCurrentHole((h) => Math.max(1, h - 1))}
-            onNext={() => setCurrentHole((h) => Math.min(sc.holesPlayed, h + 1))}
+            onPrev={() => setCurrentHole((h) => Math.max(firstHole, h - 1))}
+            onNext={() => setCurrentHole((h) => Math.min(lastHole, h + 1))}
             hasMissingScores={anyMissingPrev}
           />
 

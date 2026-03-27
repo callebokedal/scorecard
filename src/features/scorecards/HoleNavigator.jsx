@@ -3,21 +3,23 @@ import { useTranslation } from 'react-i18next';
 /**
  * Hole navigation bar — prev/next arrows with hole info in the center.
  * @param {object} props
- * @param {number} props.currentHole - 1-based
- * @param {number} props.totalHoles
+ * @param {number} props.currentHole - absolute hole number (e.g. 10 for back 9)
+ * @param {number} props.firstHole - first hole of the round (1 or 10)
+ * @param {number} props.lastHole - last hole of the round (9 or 18)
+ * @param {number} props.totalHoles - total holes being played
  * @param {import('../../types/models').HoleInfo|null} props.holeInfo
  * @param {() => void} props.onPrev
  * @param {() => void} props.onNext
  * @param {boolean} [props.hasMissingScores]
  */
-export function HoleNavigator({ currentHole, totalHoles, holeInfo, onPrev, onNext, hasMissingScores }) {
+export function HoleNavigator({ currentHole, firstHole, lastHole, totalHoles, holeInfo, onPrev, onNext, hasMissingScores }) {
   const { t } = useTranslation();
 
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 shadow-sm">
       <button
         onClick={onPrev}
-        disabled={currentHole <= 1}
+        disabled={currentHole <= firstHole}
         className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 disabled:opacity-30 hover:bg-gray-200 active:scale-95 transition-transform text-lg"
         aria-label={t('common.back')}
       >
@@ -44,7 +46,7 @@ export function HoleNavigator({ currentHole, totalHoles, holeInfo, onPrev, onNex
           <div className="text-sm text-gray-400">{t('scorecard.noCourseSelected')}</div>
         )}
         <div className="text-xs text-gray-400 mt-0.5">
-          {t('scorecard.holeFraction', { current: currentHole, total: totalHoles })}
+          {t('scorecard.holeFraction', { current: currentHole - firstHole + 1, total: totalHoles })}
         </div>
         {hasMissingScores && (
           <div className="flex items-center justify-center gap-1 mt-1 text-amber-500 text-xs">
@@ -56,7 +58,7 @@ export function HoleNavigator({ currentHole, totalHoles, holeInfo, onPrev, onNex
 
       <button
         onClick={onNext}
-        disabled={currentHole >= totalHoles}
+        disabled={currentHole >= lastHole}
         className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 disabled:opacity-30 hover:bg-gray-200 active:scale-95 transition-transform text-lg"
         aria-label="→"
       >

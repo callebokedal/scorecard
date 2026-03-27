@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePlayersStore } from '../store/players.store';
 import { PlayerFormModal } from '../features/players/PlayerFormModal';
+import { exportJSON } from '../services/importExport.service';
 
 export default function PlayersPage() {
   const { t } = useTranslation();
@@ -57,6 +58,12 @@ export default function PlayersPage() {
                   onClick={() => setEditingPlayer(player)}
                 >
                   {t('common.edit')}
+                </button>
+                <button
+                  className="flex-1 py-2 text-sm text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => exportJSON(player, `player-${player.name.replace(/\s+/g, '-').toLowerCase()}`)}
+                >
+                  {t('common.export')}
                 </button>
                 <button
                   className="flex-1 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-br-xl"

@@ -37,9 +37,24 @@ export function exportYAML(data, filename) {
 }
 
 /**
+ * Merge an array of incoming items into an existing array by `id`.
+ * Items with matching IDs are replaced; new IDs are appended.
+ * @template {{ id: string }} T
+ * @param {T[]} existing
+ * @param {T[]} incoming
+ * @returns {T[]}
+ */
+export function mergeById(existing, incoming) {
+  const map = new Map(existing.map((item) => [item.id, item]));
+  incoming.forEach((item) => map.set(item.id, item));
+  return [...map.values()];
+}
+
+/**
  * Read and parse a JSON or YAML file selected by the user.
+ * Accepts either a single object or an array — always returns an array.
  * @param {File} file
- * @returns {Promise<unknown>}
+ * @returns {Promise<unknown[]>}
  */
 export function importFile(file) {
   return new Promise((resolve, reject) => {
@@ -48,7 +63,8 @@ export function importFile(file) {
       try {
         const text = e.target.result;
         const isYaml = file.name.endsWith('.yaml') || file.name.endsWith('.yml');
-        resolve(isYaml ? yaml.load(text) : JSON.parse(text));
+        const parsed = isYaml ? yaml.load(text) : JSON.parse(text);
+        resolve(Array.isArray(parsed) ? parsed : [parsed]);
       } catch (err) {
         reject(new Error(`Parse error: ${err.message}`));
       }

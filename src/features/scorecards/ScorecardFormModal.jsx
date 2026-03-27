@@ -33,16 +33,18 @@ export function ScorecardFormModal({ onClose, onCreated }) {
   const [name, setName] = useState('');
   const [date, setDate] = useState(todayISO());
   const [holesPlayed, setHolesPlayed] = useState(18);
+  const [startHole, setStartHole] = useState(1);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
 
   useEffect(() => {
     const course = allCourses.find((c) => c.courseId === courseId);
     if (course) {
       setName(course.courseName);
-      setHolesPlayed(course.holes);
+      setHolesPlayed(course.holes <= 9 ? course.holes : 18);
     } else {
       setHolesPlayed(18);
     }
+    setStartHole(1);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
@@ -68,7 +70,7 @@ export function ScorecardFormModal({ onClose, onCreated }) {
         playerId: pid,
         name: player.name,
         hcp: player.hcp,
-        holes: createInitialHoleScores(holesPlayed),
+        holes: createInitialHoleScores(holesPlayed, startHole),
       };
     });
 
@@ -77,6 +79,7 @@ export function ScorecardFormModal({ onClose, onCreated }) {
       date,
       courseId: courseId || null,
       holesPlayed,
+      startHole,
       players: scorecardPlayers,
     });
 
@@ -123,37 +126,65 @@ export function ScorecardFormModal({ onClose, onCreated }) {
           />
         </div>
 
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('scorecards.form.date')}
-            </label>
-            <input
-              type="date"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </div>
-          <div className="w-24">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('scorecards.form.holes')}
-            </label>
-            <select
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              value={holesPlayed}
-              onChange={(e) => setHolesPlayed(Number(e.target.value))}
-            >
-              {selectedCourse && selectedCourse.holes === 9 ? (
-                <option value={9}>9</option>
-              ) : (
-                <>
-                  <option value={9}>9</option>
-                  <option value={18}>18</option>
-                </>
-              )}
-            </select>
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('scorecards.form.date')}
+          </label>
+          <input
+            type="date"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('scorecards.form.holes')}
+          </label>
+          {selectedCourse?.holes === 9 ? (
+            <div className="px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
+              9 {t('clubs.courseForm.holesLocked')}
+            </div>
+          ) : selectedCourse?.holes === 18 ? (
+            <div className="flex rounded-lg overflow-hidden border border-gray-200">
+              {[
+                { label: t('scorecards.form.holesFull'), holes: 18, start: 1 },
+                { label: t('scorecards.form.holesFront9'), holes: 9, start: 1 },
+                { label: t('scorecards.form.holesBack9'), holes: 9, start: 10 },
+              ].map((opt) => (
+                <button
+                  key={opt.label}
+                  type="button"
+                  onClick={() => { setHolesPlayed(opt.holes); setStartHole(opt.start); }}
+                  className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                    holesPlayed === opt.holes && startHole === opt.start
+                      ? 'bg-green-600 text-white'
+                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="flex rounded-lg overflow-hidden border border-gray-200">
+              {[9, 18].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => { setHolesPlayed(n); setStartHole(1); }}
+                  className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                    holesPlayed === n
+                      ? 'bg-green-600 text-white'
+                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>

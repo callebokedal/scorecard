@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useClubsStore } from '../store/clubs.store';
@@ -6,6 +6,7 @@ import { TopNav } from '../components/layout/TopNav';
 import { CourseFormModal } from '../features/clubs/CourseFormModal';
 import { HoleTable } from '../features/clubs/HoleTable';
 import { ClubFormModal } from '../features/clubs/ClubFormModal';
+import { exportJSON, importFile } from '../services/importExport.service';
 
 export default function ClubDetailPage() {
   const { t } = useTranslation();
@@ -13,6 +14,7 @@ export default function ClubDetailPage() {
   const navigate = useNavigate();
   const clubs = useClubsStore((s) => s.clubs);
   const removeCourse = useClubsStore((s) => s.removeCourse);
+  const editClub = useClubsStore((s) => s.editClub);
 
   const club = clubs.find((c) => c.id === clubId);
 
@@ -20,6 +22,25 @@ export default function ClubDetailPage() {
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
   const [editingClub, setEditingClub] = useState(false);
+  const importCourseRef = useRef(null);
+
+  const handleImportCourse = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    try {
+      const [course] = await importFile(file);
+      if (!course?.id) throw new Error('Invalid course file');
+      const exists = club.courses.some((c) => c.id === course.id);
+      const updatedCourses = exists
+        ? club.courses.map((c) => c.id === course.id ? { ...course, clubId } : c)
+        : [...club.courses, { ...course, clubId }];
+      editClub(clubId, { courses: updatedCourses });
+      setActiveTab(updatedCourses.findIndex((c) => c.id === course.id));
+    } catch (err) {
+      alert(t('settings.importError') + ': ' + err.message);
+    }
+  };
 
   const backBtn = (
     <button
@@ -59,12 +80,20 @@ export default function ClubDetailPage() {
             {club.address && <p className="text-sm text-gray-500">{club.address}</p>}
             {club.note && <p className="text-sm text-gray-400 mt-0.5 italic">{club.note}</p>}
           </div>
-          <button
-            onClick={() => setEditingClub(true)}
-            className="text-sm text-green-700 font-medium hover:underline ml-4 shrink-0"
-          >
-            {t('clubs.editClubBtn')}
-          </button>
+          <div className="flex items-center gap-3 ml-4 shrink-0">
+            <button
+              onClick={() => exportJSON(club, `club-${club.name.replace(/\s+/g, '-').toLowerCase()}`)}
+              className="text-sm text-gray-400 font-medium hover:underline"
+            >
+              {t('common.export')}
+            </button>
+            <button
+              onClick={() => setEditingClub(true)}
+              className="text-sm text-green-700 font-medium hover:underline"
+            >
+              {t('clubs.editClubBtn')}
+            </button>
+          </div>
         </div>
 
         {/* Course tabs */}
@@ -88,6 +117,19 @@ export default function ClubDetailPage() {
           >
             {t('clubs.addCourseBtn')}
           </button>
+          <button
+            onClick={() => importCourseRef.current?.click()}
+            className="shrink-0 px-3 py-1.5 rounded-full text-sm font-medium bg-white border border-dashed border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-600"
+          >
+            {t('clubs.importCourseBtn')}
+          </button>
+          <input
+            ref={importCourseRef}
+            type="file"
+            accept=".json,.yaml,.yml"
+            className="hidden"
+            onChange={handleImportCourse}
+          />
         </div>
 
         {/* Course content */}
@@ -103,6 +145,12 @@ export default function ClubDetailPage() {
                 )}
               </div>
               <div className="flex gap-3">
+                <button
+                  onClick={() => exportJSON(activeCourse, `course-${activeCourse.name.replace(/\s+/g, '-').toLowerCase()}`)}
+                  className="text-sm text-gray-400 font-medium hover:underline"
+                >
+                  {t('common.export')}
+                </button>
                 <button
                   onClick={() => setEditingCourse(activeCourse)}
                   className="text-sm text-green-700 font-medium hover:underline"

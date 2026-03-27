@@ -4,7 +4,7 @@ import { useSettingsStore } from '../store/settings.store';
 import { useClubsStore } from '../store/clubs.store';
 import { usePlayersStore } from '../store/players.store';
 import { useScorecardsStore } from '../store/scorecards.store';
-import { exportJSON, exportYAML, importFile } from '../services/importExport.service';
+import { exportJSON, exportYAML, importFile, mergeById } from '../services/importExport.service';
 import { saveClubs, loadClubs } from '../services/clubs.service';
 import { savePlayers, loadPlayers } from '../services/players.service';
 import { saveScorecards, loadScorecards } from '../services/scorecards.service';
@@ -54,9 +54,9 @@ export default function SettingsPage() {
           onExportYAML={() => exportYAML(loadClubs(), 'scorecard-clubs')}
           onImport={async (file) => {
             const data = await importFile(file);
-            if (!Array.isArray(data)) throw new Error('Expected an array of clubs');
-            saveClubs(data);
-            useClubsStore.setState({ clubs: data });
+            const merged = mergeById(loadClubs(), data);
+            saveClubs(merged);
+            useClubsStore.setState({ clubs: merged });
           }}
           entity={t('nav.clubs').toLowerCase()}
         />
@@ -70,9 +70,9 @@ export default function SettingsPage() {
           onExportYAML={() => exportYAML(loadPlayers(), 'scorecard-players')}
           onImport={async (file) => {
             const data = await importFile(file);
-            if (!Array.isArray(data)) throw new Error('Expected an array of players');
-            savePlayers(data);
-            usePlayersStore.setState({ players: data });
+            const merged = mergeById(loadPlayers(), data);
+            savePlayers(merged);
+            usePlayersStore.setState({ players: merged });
           }}
           entity={t('nav.players').toLowerCase()}
         />
@@ -86,9 +86,9 @@ export default function SettingsPage() {
           onExportYAML={() => exportYAML(loadScorecards(), 'scorecard-rounds')}
           onImport={async (file) => {
             const data = await importFile(file);
-            if (!Array.isArray(data)) throw new Error('Expected an array of scorecards');
-            saveScorecards(data);
-            useScorecardsStore.setState({ scorecards: data });
+            const merged = mergeById(loadScorecards(), data);
+            saveScorecards(merged);
+            useScorecardsStore.setState({ scorecards: merged });
           }}
           entity={t('nav.scorecards').toLowerCase()}
         />
@@ -155,7 +155,7 @@ function DataRow({ label, onExportJSON, onExportYAML, onImport, entity }) {
     if (!file) return;
     e.target.value = '';
 
-    const confirmed = window.confirm(t('settings.confirmImport', { entity }));
+    const confirmed = window.confirm(t('settings.confirmImportMerge', { entity }));
     if (!confirmed) return;
 
     try {
