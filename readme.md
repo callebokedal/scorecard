@@ -8,6 +8,15 @@ A simple to use Golf Scorecard app for 1-4 players. The app let's you manage cou
 
 Except score per hole, the app also let's you track number of putts, tee accuracy (long/short/left/right/hit or miss), penalty shots (water, out of bounds or other), bunkers (near green/fairway) per player and hole.
 
+## App demo
+
+
+You can test the app here:
+https://callebokedal.github.io/scorecard/#/scorecards
+
+It should laso be possible to save this file locally and use that instead.
+Remember that the web browsers local storage is used to save all items - to remember to export your data to have a backup.
+
 ## App functionality
 - It should be possible to manage clubs:
     - Unqiue uid
