@@ -21,7 +21,8 @@ export function HoleEntryForm({ holeScore, onChange }) {
           value={h.strokes}
           min={0}
           max={20}
-          onChange={(v) => onChange({ strokes: v })}
+          onChange={(v) => onChange({ strokes: v, skipped: false })}
+          onSkip={() => onChange({ strokes: null, skipped: true })}
         />
         <CounterField
           label={t('scorecard.putts')}

@@ -55,13 +55,13 @@ export function ScoreQuickEntryModal({ playerName, holeScore, onChange, onClose 
             <button
               type="button"
               onClick={() => { onChange({ strokes: null, skipped: true }); onClose(); }}
-              className={`h-12 rounded-lg text-xl font-semibold cursor-pointer transition-colors ${
+              className={`h-12 rounded-lg cursor-pointer transition-colors flex items-center justify-center ${
                 holeScore.skipped
-                  ? 'bg-gray-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-gray-100 text-red-400 hover:bg-red-50'
               }`}
             >
-              —
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
             </button>
             <button
               type="button"
