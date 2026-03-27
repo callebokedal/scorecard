@@ -23,10 +23,10 @@ fi
 git cm "New build"
 
 
-read -rp "Push? [y/N] " confirm_push
-if [[ "$confirm_push" != "y" && "$confirm_commit" != "Y" ]]; then
-  echo "Aborted."
-  exit 1
+read -rp "Push? [Y/n] " confirm_push
+if [[ "$confirm_push" == "n" || "$confirm_push" == "N" ]]; then
+  echo "Skipped push."
+  exit 0
 fi
 
 git push
