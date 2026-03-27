@@ -14,8 +14,8 @@ export function HoleEntryForm({ holeScore, onChange }) {
   const h = holeScore;
 
   return (
-    <div className="px-4 pb-4">
-      <div className="divide-y divide-gray-100">
+    <div>
+      <div className="px-4">
         <CounterField
           label={t('scorecard.score')}
           value={h.strokes}
@@ -24,6 +24,9 @@ export function HoleEntryForm({ holeScore, onChange }) {
           onChange={(v) => onChange({ strokes: v, skipped: false })}
           onSkip={() => onChange({ strokes: null, skipped: true })}
         />
+      </div>
+
+      <div className="bg-gray-50 px-4 border-t border-gray-100">
         <CounterField
           label={t('scorecard.putts')}
           value={h.putts}
@@ -33,11 +36,16 @@ export function HoleEntryForm({ holeScore, onChange }) {
         />
       </div>
 
-      <div className="mt-1 pt-2 border-t border-gray-100">
-        <TeeShotNavigator value={h.teeShot} onChange={(v) => onChange({ teeShot: v })} />
+      <div className="mt-0 pt-2 border-t border-gray-100 bg-gray-50 px-4">
+        <TeeShotNavigator
+          value={h.teeShot}
+          onChange={(v) => onChange({ teeShot: v })}
+          club={h.teeClub}
+          onClubChange={(v) => onChange({ teeClub: v })}
+        />
       </div>
 
-      <div className="mt-3 pt-3 border-t border-gray-100">
+      <div className="mt-0 pt-3 border-t border-gray-100 bg-gray-50 px-4 pb-3">
         <span className="text-sm font-medium text-gray-700 block mb-2">{t('scorecard.bunkers')}</span>
         <div className="flex flex-wrap gap-2">
           <ChipCounter
@@ -58,7 +66,7 @@ export function HoleEntryForm({ holeScore, onChange }) {
         </div>
       </div>
 
-      <div className="mt-3 pt-3 border-t border-gray-100">
+      <div className="mt-0 pt-3 border-t border-gray-100 bg-gray-50 px-4 pb-3">
         <span className="text-sm font-medium text-gray-700 block mb-2">{t('scorecard.penalties')}</span>
         <div className="flex flex-wrap gap-2">
           <ChipCounter

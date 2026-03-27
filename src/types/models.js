@@ -72,6 +72,7 @@
  * @property {number|null} strokes - Gross strokes (null = not yet entered)
  * @property {number} putts
  * @property {TeeShot|null} teeShot - 'hit'|'left'|'right'|'long'|'short'|'miss'|null
+ * @property {TeeClub|null} teeClub - club used on tee, null if not recorded
  * @property {boolean} skipped - true if the hole was deliberately skipped
  * @property {number} bunkersNearGreen
  * @property {number} bunkersFairway
@@ -83,4 +84,8 @@
 
 /**
  * @typedef {'hit'|'left'|'right'|'long'|'short'|'miss'} TeeShot
+ */
+
+/**
+ * @typedef {'1W'|'3W'|'5W'|'7W'|'2H'|'3H'|'4H'|'5H'|'2i'|'3i'|'4i'|'5i'|'6i'|'7i'|'8i'|'9i'} TeeClub
  */

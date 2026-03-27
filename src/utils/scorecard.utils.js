@@ -10,6 +10,7 @@ export function createInitialHoleScores(holesPlayed) {
     skipped: false,
     putts: 0,
     teeShot: null,
+    teeClub: null,
     bunkersNearGreen: 0,
     bunkersFairway: 0,
     bunkersOther: 0,
