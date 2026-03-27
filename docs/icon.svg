@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- App icon background -->
+  <rect width="512" height="512" rx="96" fill="#15803d"/>
+
+  <!-- Flagstick -->
+  <rect x="222" y="110" width="20" height="280" rx="10" fill="white"/>
+
+  <!-- Flag (pointing right) -->
+  <polygon points="242,110 242,210 360,160" fill="white"/>
+
+  <!-- Hole shadow -->
+  <ellipse cx="252" cy="392" rx="80" ry="20" fill="#0f5c2b"/>
+
+  <!-- Ball -->
+  <circle cx="310" cy="370" r="26" fill="white"/>
+  <circle cx="318" cy="363" r="5" fill="#d1fae5" opacity="0.6"/>
+</svg>
