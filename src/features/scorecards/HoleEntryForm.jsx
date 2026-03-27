@@ -8,8 +8,9 @@ import { ChipCounter } from './ChipCounter';
  * @param {object} props
  * @param {import('../../types/models').HoleScore} props.holeScore
  * @param {(updates: Partial<import('../../types/models').HoleScore>) => void} props.onChange
+ * @param {() => void} [props.onStrokeClick] - Opens quick score entry modal when strokes value is tapped
  */
-export function HoleEntryForm({ holeScore, onChange }) {
+export function HoleEntryForm({ holeScore, onChange, onStrokeClick }) {
   const { t } = useTranslation();
   const h = holeScore;
 
@@ -23,6 +24,7 @@ export function HoleEntryForm({ holeScore, onChange }) {
           max={20}
           onChange={(v) => onChange({ strokes: v, skipped: false })}
           onSkip={() => onChange({ strokes: null, skipped: true })}
+          onValueClick={onStrokeClick}
         />
       </div>
 

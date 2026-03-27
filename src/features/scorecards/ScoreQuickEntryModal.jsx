@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../../components/common/Modal';
+import { calcStablefordPoints } from '../../utils/scorecard.utils';
 
 /**
  * Numpad modal for quick score entry on a single hole.
@@ -9,8 +10,10 @@ import { Modal } from '../../components/common/Modal';
  * @param {import('../../types/models').HoleScore} props.holeScore
  * @param {(updates: Partial<import('../../types/models').HoleScore>) => void} props.onChange
  * @param {() => void} props.onClose
+ * @param {import('../../types/models').HoleInfo|null} [props.holeInfo]
+ * @param {number} [props.hcpStrokes]
  */
-export function ScoreQuickEntryModal({ playerName, holeScore, onChange, onClose }) {
+export function ScoreQuickEntryModal({ playerName, holeScore, onChange, onClose, holeInfo, hcpStrokes = 0 }) {
   const { t } = useTranslation();
   const [showHighRange, setShowHighRange] = useState(holeScore.strokes >= 10);
 
@@ -19,20 +22,33 @@ export function ScoreQuickEntryModal({ playerName, holeScore, onChange, onClose 
     onClose();
   };
 
+  const expectedStrokes = holeInfo ? holeInfo.par + hcpStrokes : null;
+
   const numBtn = (n) => {
     const isActive = holeScore.strokes === n && !holeScore.skipped;
+    const isExpected = n === expectedStrokes;
+    const points = holeInfo ? calcStablefordPoints(n, holeInfo.par, hcpStrokes) : null;
     return (
       <button
         key={n}
         type="button"
         onClick={() => select(n)}
-        className={`h-14 rounded-lg text-lg font-semibold cursor-pointer transition-colors ${
+        className={`h-14 rounded-lg text-lg font-semibold cursor-pointer transition-colors flex flex-col items-center justify-center gap-0 ${
           isActive
             ? 'bg-green-600 text-white'
+            : isExpected
+            ? 'bg-gray-100 text-gray-800 hover:bg-gray-200 ring-2 ring-green-500'
             : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
         }`}
       >
-        {n}
+        <span>{n}</span>
+        {points != null && (
+          <span className={`text-[10px] font-medium leading-none ${
+            isActive ? 'text-green-100' : points >= 3 ? 'text-green-600' : points === 0 ? 'text-gray-400' : 'text-gray-500'
+          }`}>
+            {points}p
+          </span>
+        )}
       </button>
     );
   };

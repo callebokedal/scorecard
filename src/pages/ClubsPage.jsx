@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useClubsStore } from '../store/clubs.store';
 import { ClubFormModal } from '../features/clubs/ClubFormModal';
+import { importFile, mergeById } from '../services/importExport.service';
+import { saveClubs, loadClubs } from '../services/clubs.service';
 
 export default function ClubsPage() {
   const { t } = useTranslation();
@@ -12,6 +14,25 @@ export default function ClubsPage() {
 
   const [showAdd, setShowAdd] = useState(false);
   const [editingClub, setEditingClub] = useState(null);
+  const [importStatus, setImportStatus] = useState(null); // 'ok' | 'error' | null
+  const importRef = useRef(null);
+
+  const handleImport = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    try {
+      const data = await importFile(file);
+      const merged = mergeById(loadClubs(), data);
+      saveClubs(merged);
+      useClubsStore.setState({ clubs: merged });
+      setImportStatus('ok');
+    } catch (err) {
+      console.error(err);
+      setImportStatus('error');
+    }
+    setTimeout(() => setImportStatus(null), 3000);
+  };
 
   const handleDelete = (club) => {
     if (window.confirm(t('clubs.confirmDelete', { name: club.name }))) {
@@ -23,12 +44,33 @@ export default function ClubsPage() {
     <div className="p-4 max-w-lg mx-auto">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-gray-800">{t('clubs.title')}</h1>
-        <button
-          onClick={() => setShowAdd(true)}
-          className="bg-green-600 text-white text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-green-700"
-        >
-          {t('clubs.addBtn')}
-        </button>
+        <div className="flex items-center gap-2">
+          {importStatus === 'ok' && (
+            <span className="text-xs text-green-600 font-medium">{t('settings.importSuccess')} ✓</span>
+          )}
+          {importStatus === 'error' && (
+            <span className="text-xs text-red-500 font-medium">{t('settings.importError')} ✕</span>
+          )}
+          <button
+            onClick={() => importRef.current?.click()}
+            className="text-sm font-medium px-3 py-1.5 rounded-lg border border-dashed border-gray-300 text-gray-500 hover:border-green-500 hover:text-green-600"
+          >
+            {t('clubs.importClubBtn')}
+          </button>
+          <input
+            ref={importRef}
+            type="file"
+            accept=".json,.yaml,.yml"
+            className="hidden"
+            onChange={handleImport}
+          />
+          <button
+            onClick={() => setShowAdd(true)}
+            className="bg-green-600 text-white text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-green-700"
+          >
+            {t('clubs.addBtn')}
+          </button>
+        </div>
       </div>
 
       {clubs.length === 0 ? (

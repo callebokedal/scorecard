@@ -89,7 +89,7 @@ export function Leaderboard({ scorecard, course }) {
     : orientation === 'landscape' ? 'block'
     : 'hidden landscape:block';
 
-  const totalHoles = scorecard.holesPlayed <= 9 ? 9 : 18;
+  const totalHoles = course?.holes ?? (scorecard.holesPlayed <= 9 ? 9 : 18);
 
   const rows = scorecard.players
     .map((player) => {

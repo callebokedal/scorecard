@@ -14,6 +14,7 @@ import {
  * @param {import('../../types/models').HoleScore} props.holeScore
  * @param {import('../../types/models').HoleInfo|null} props.holeInfo - null if no course selected
  * @param {number|null} props.courseSlope
+ * @param {number} [props.courseHoles] - Total holes on the course (9 or 18), used for HCP distribution
  * @param {boolean} props.expanded
  * @param {() => void} props.onToggle
  * @param {(updates: Partial<import('../../types/models').HoleScore>) => void} props.onChange
@@ -24,6 +25,7 @@ export function PlayerAccordion({
   holeScore,
   holeInfo,
   courseSlope,
+  courseHoles = 18,
   expanded,
   onToggle,
   onChange,
@@ -36,7 +38,7 @@ export function PlayerAccordion({
 
   const hcpStrokes =
     playingHcp != null && holeInfo
-      ? hcpStrokesOnHole(playingHcp, holeInfo.slopeIndex, holeInfo.holeNumber <= 9 ? 9 : 18)
+      ? hcpStrokesOnHole(playingHcp, holeInfo.slopeIndex, courseHoles)
       : 0;
 
   const points =
@@ -100,7 +102,7 @@ export function PlayerAccordion({
         {/* Body */}
         {expanded && (
           <div className="border-t border-gray-100">
-            <HoleEntryForm holeScore={holeScore} onChange={onChange} />
+            <HoleEntryForm holeScore={holeScore} onChange={onChange} onStrokeClick={() => setQuickEntryOpen(true)} />
           </div>
         )}
       </div>
@@ -109,6 +111,8 @@ export function PlayerAccordion({
         <ScoreQuickEntryModal
           playerName={player.name}
           holeScore={holeScore}
+          holeInfo={holeInfo}
+          hcpStrokes={hcpStrokes}
           onChange={onChange}
           onClose={() => setQuickEntryOpen(false)}
         />
