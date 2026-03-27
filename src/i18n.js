@@ -125,6 +125,7 @@ const resources = {
       scorecard: {
         tabScorecard: 'Scorecard',
         tabLeaderboard: 'Leaderboard',
+        tabStats: 'Stats',
         markComplete: 'Mark Round as Complete ✓',
         reopen: 'Reopen Round',
         hole: 'Hole {{number}}',
@@ -155,6 +156,15 @@ const resources = {
         right: 'Right',
         short: 'Short',
         miss: 'Miss',
+        stats: {
+          holesPlayed: 'holes played',
+          totalStrokes: 'Total strokes',
+          avgStrokes: 'Avg strokes / hole',
+          totalPutts: 'Total putts',
+          avgPutts: 'Avg putts / hole',
+          total: 'Total',
+          noData: 'No data recorded',
+        },
         lb: {
           rank: '#',
           player: 'Player',
@@ -312,6 +322,7 @@ const resources = {
       scorecard: {
         tabScorecard: 'Scorekort',
         tabLeaderboard: 'Ledartavla',
+        tabStats: 'Statistik',
         markComplete: 'Markera runda som klar ✓',
         reopen: 'Återöppna runda',
         hole: 'Hål {{number}}',
@@ -342,6 +353,15 @@ const resources = {
         right: 'Höger',
         short: 'Kort',
         miss: 'Miss',
+        stats: {
+          holesPlayed: 'hål spelade',
+          totalStrokes: 'Totala slag',
+          avgStrokes: 'Snitt slag / hål',
+          totalPutts: 'Totala puttar',
+          avgPutts: 'Snitt puttar / hål',
+          total: 'Totalt',
+          noData: 'Ingen data registrerad',
+        },
         lb: {
           rank: '#',
           player: 'Spelare',

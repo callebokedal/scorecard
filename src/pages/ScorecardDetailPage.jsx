@@ -7,6 +7,7 @@ import { TopNav } from '../components/layout/TopNav';
 import { HoleNavigator } from '../features/scorecards/HoleNavigator';
 import { PlayerAccordion } from '../features/scorecards/PlayerAccordion';
 import { Leaderboard } from '../features/scorecards/Leaderboard';
+import { RoundStatsTab } from '../features/scorecards/RoundStatsTab';
 import { formatDate } from '../utils/scorecard.utils';
 
 export default function ScorecardDetailPage() {
@@ -77,7 +78,7 @@ export default function ScorecardDetailPage() {
     setExpandedPlayerId((prev) => (prev === playerId ? null : playerId));
   };
 
-  const tabs = [t('scorecard.tabScorecard'), t('scorecard.tabLeaderboard')];
+  const tabs = [t('scorecard.tabScorecard'), t('scorecard.tabLeaderboard'), t('scorecard.tabStats')];
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -154,9 +155,13 @@ export default function ScorecardDetailPage() {
             </div>
           </div>
         </div>
-      ) : (
+      ) : activeTab === 1 ? (
         <div className="flex-1 overflow-y-auto w-full">
           <Leaderboard scorecard={sc} course={course} />
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto w-full">
+          <RoundStatsTab scorecard={sc} />
         </div>
       )}
     </div>
