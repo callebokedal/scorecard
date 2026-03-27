@@ -14,13 +14,13 @@ fi
 
 git add .
 
-read -rp "Commit with message 'New build'? [y/N] " confirm_commit
-if [[ "$confirm_commit" != "y" && "$confirm_commit" != "Y" ]]; then
+read -rp "Commit message (empty to abort): " commit_msg
+if [[ -z "$commit_msg" ]]; then
   echo "Aborted."
   exit 1
 fi
 
-git cm "New build"
+git cm "$commit_msg"
 
 
 read -rp "Push? [Y/n] " confirm_push
