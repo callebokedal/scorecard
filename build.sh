@@ -28,3 +28,5 @@ if [[ "$confirm_push" != "y" && "$confirm_commit" != "Y" ]]; then
   echo "Aborted."
   exit 1
 fi
+
+git push
