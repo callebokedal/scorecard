@@ -109,6 +109,17 @@ Pages are, except for links in certain situations, accessible via a hamburger me
 - Zustand for client state (when/if needed)
 - react-i18next - since at least English/Swedish are to be supported for texts and labels
 
+## Production build
+
+Builds a fully self-contained single HTML file with all JS and CSS inlined — open directly in a browser or share without a server.
+
+```sh
+podman run --rm -v $(pwd):/app:z -w /app node:22-alpine sh -c "npm run build"
+# Output: docs/index.html
+```
+
+---
+
 ## Development build instructions
 ```sh
 
