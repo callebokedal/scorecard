@@ -161,7 +161,7 @@ export default function ScorecardDetailPage() {
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto w-full">
-          <RoundStatsTab scorecard={sc} />
+          <RoundStatsTab scorecard={sc} course={course} />
         </div>
       )}
     </div>

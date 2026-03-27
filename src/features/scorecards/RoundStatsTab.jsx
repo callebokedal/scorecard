@@ -1,48 +1,86 @@
 import { useTranslation } from 'react-i18next';
+import {
+  calcPlayingHcp,
+  hcpStrokesOnHole,
+  calcStablefordPoints,
+} from '../../utils/scorecard.utils';
+
+const TEE_DIRECTIONS = ['hit', 'long', 'short', 'left', 'right', 'miss'];
+const DIR_LABEL = { hit: '✓', long: '▲', short: '▼', left: '◄', right: '►', miss: '✕' };
+const DIR_COLOR = {
+  hit: 'text-green-600',
+  long: 'text-blue-500',
+  short: 'text-blue-500',
+  left: 'text-amber-500',
+  right: 'text-amber-500',
+  miss: 'text-red-500',
+};
 
 /**
  * Aggregated round statistics per player.
  * @param {object} props
  * @param {import('../../types/models').Scorecard} props.scorecard
+ * @param {import('../../types/models').Course|null} props.course
  */
-export function RoundStatsTab({ scorecard }) {
+export function RoundStatsTab({ scorecard, course }) {
   const { t } = useTranslation();
-
   return (
     <div className="p-4 max-w-lg mx-auto flex flex-col gap-6">
       {scorecard.players.map((player) => (
-        <PlayerStats key={player.playerId} player={player} t={t} />
+        <PlayerStats key={player.playerId} player={player} course={course} t={t} />
       ))}
     </div>
   );
 }
 
-function PlayerStats({ player, t }) {
+function PlayerStats({ player, course, t }) {
+  const playingHcp = course ? calcPlayingHcp(player.hcp, course.slope) : null;
+
   const played = player.holes.filter((h) => h.strokes != null);
   const totalStrokes = played.reduce((s, h) => s + h.strokes, 0);
   const totalPutts = played.reduce((s, h) => s + (h.putts ?? 0), 0);
-  const avgStrokes = played.length ? (totalStrokes / played.length).toFixed(1) : '—';
   const avgPutts = played.length ? (totalPutts / played.length).toFixed(1) : '—';
 
+  // Points per hole (requires course)
+  let totalPoints = 0;
+  let pointsHoles = 0;
+  if (course) {
+    for (const h of played) {
+      const info = course.holeInfo.find((hi) => hi.holeNumber === h.holeNumber);
+      if (info) {
+        const hcpStrokes = hcpStrokesOnHole(playingHcp, info.slopeIndex, course.holes);
+        totalPoints += calcStablefordPoints(h.strokes, info.par, hcpStrokes);
+        pointsHoles++;
+      }
+    }
+  }
+  const avgPoints = pointsHoles ? (totalPoints / pointsHoles).toFixed(2) : null;
+
+  // Tee shots
   const teeShotHoles = player.holes.filter((h) => h.teeShot != null);
-  const teeCounts = { hit: 0, long: 0, short: 0, left: 0, right: 0, miss: 0 };
+  const teeCounts = Object.fromEntries(TEE_DIRECTIONS.map((d) => [d, 0]));
   teeShotHoles.forEach((h) => { if (h.teeShot in teeCounts) teeCounts[h.teeShot]++; });
 
-  const clubCounts = {};
+  // Per-club breakdown: { clubName: { hit, long, short, left, right, miss } }
+  const clubStats = {};
   player.holes.forEach((h) => {
-    if (h.teeClub) clubCounts[h.teeClub] = (clubCounts[h.teeClub] ?? 0) + 1;
+    if (!h.teeClub || !h.teeShot) return;
+    if (!clubStats[h.teeClub]) clubStats[h.teeClub] = Object.fromEntries(TEE_DIRECTIONS.map((d) => [d, 0]));
+    if (h.teeShot in clubStats[h.teeClub]) clubStats[h.teeClub][h.teeShot]++;
   });
-  const clubEntries = Object.entries(clubCounts).sort((a, b) => b[1] - a[1]);
+  const clubEntries = Object.entries(clubStats).sort(
+    (a, b) => Object.values(b[1]).reduce((s, v) => s + v, 0) - Object.values(a[1]).reduce((s, v) => s + v, 0)
+  );
 
-  const totalBunkersNearGreen = player.holes.reduce((s, h) => s + (h.bunkersNearGreen ?? 0), 0);
-  const totalBunkersFairway = player.holes.reduce((s, h) => s + (h.bunkersFairway ?? 0), 0);
-  const totalBunkersOther = player.holes.reduce((s, h) => s + (h.bunkersOther ?? 0), 0);
-  const totalBunkers = totalBunkersNearGreen + totalBunkersFairway + totalBunkersOther;
+  // Bunkers
+  const bunkersNearGreen = player.holes.reduce((s, h) => s + (h.bunkersNearGreen ?? 0), 0);
+  const bunkersFairway = player.holes.reduce((s, h) => s + (h.bunkersFairway ?? 0), 0);
+  const bunkersOther = player.holes.reduce((s, h) => s + (h.bunkersOther ?? 0), 0);
 
-  const totalPenaltiesWater = player.holes.reduce((s, h) => s + (h.penaltiesWater ?? 0), 0);
-  const totalPenaltiesOOB = player.holes.reduce((s, h) => s + (h.penaltiesOOB ?? 0), 0);
-  const totalPenaltiesOther = player.holes.reduce((s, h) => s + (h.penaltiesOther ?? 0), 0);
-  const totalPenalties = totalPenaltiesWater + totalPenaltiesOOB + totalPenaltiesOther;
+  // Penalties
+  const penaltiesWater = player.holes.reduce((s, h) => s + (h.penaltiesWater ?? 0), 0);
+  const penaltiesOOB = player.holes.reduce((s, h) => s + (h.penaltiesOOB ?? 0), 0);
+  const penaltiesOther = player.holes.reduce((s, h) => s + (h.penaltiesOther ?? 0), 0);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -57,9 +95,11 @@ function PlayerStats({ player, t }) {
       {/* Scoring */}
       <Section title={t('scorecard.score') + ' & ' + t('scorecard.putts')}>
         <StatRow label={t('scorecard.stats.totalStrokes')} value={played.length ? totalStrokes : '—'} />
-        <StatRow label={t('scorecard.stats.avgStrokes')} value={avgStrokes} />
         <StatRow label={t('scorecard.stats.totalPutts')} value={played.length ? totalPutts : '—'} />
         <StatRow label={t('scorecard.stats.avgPutts')} value={avgPutts} />
+        {avgPoints !== null && (
+          <StatRow label={t('scorecard.stats.avgPoints')} value={avgPoints} highlight />
+        )}
       </Section>
 
       {/* Tee shots */}
@@ -68,26 +108,31 @@ function PlayerStats({ player, t }) {
           <p className="text-sm text-gray-400">{t('scorecard.stats.noData')}</p>
         ) : (
           <>
-            <StatRow
-              label={t('scorecard.hit')}
-              value={`${teeCounts.hit} / ${teeShotHoles.length}`}
-              highlight={teeCounts.hit > 0}
-            />
-            <StatRow label={t('scorecard.long')} value={teeCounts.long} />
-            <StatRow label={t('scorecard.short')} value={teeCounts.short} />
-            <StatRow label={t('scorecard.left')} value={teeCounts.left} />
-            <StatRow label={t('scorecard.right')} value={teeCounts.right} />
-            <StatRow label={t('scorecard.miss')} value={teeCounts.miss} />
+            {/* Overall direction summary */}
+            <div className="flex gap-3 flex-wrap mb-3">
+              {TEE_DIRECTIONS.map((dir) => teeCounts[dir] > 0 && (
+                <span key={dir} className="flex items-center gap-1 text-sm">
+                  <span className={`font-bold ${DIR_COLOR[dir]}`}>{DIR_LABEL[dir]}</span>
+                  <span className="text-gray-700 tabular-nums">{teeCounts[dir]}</span>
+                </span>
+              ))}
+            </div>
+
+            {/* Per-club breakdown */}
             {clubEntries.length > 0 && (
-              <div className="mt-2 pt-2 border-t border-gray-100 flex flex-wrap gap-1.5">
-                {clubEntries.map(([club, count]) => (
-                  <span
-                    key={club}
-                    className="inline-flex items-center gap-1 text-xs font-medium bg-green-50 text-green-700 px-2 py-0.5 rounded-full"
-                  >
-                    {club}
-                    <span className="text-green-500">×{count}</span>
-                  </span>
+              <div className="flex flex-col gap-1.5 pt-2 border-t border-gray-100">
+                {clubEntries.map(([club, counts]) => (
+                  <div key={club} className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-gray-600 w-10 shrink-0">{club}</span>
+                    <div className="flex gap-2 flex-wrap">
+                      {TEE_DIRECTIONS.map((dir) => counts[dir] > 0 && (
+                        <span key={dir} className="flex items-center gap-0.5 text-xs">
+                          <span className={`font-bold ${DIR_COLOR[dir]}`}>{DIR_LABEL[dir]}</span>
+                          <span className="text-gray-600 tabular-nums">{counts[dir]}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
@@ -97,18 +142,18 @@ function PlayerStats({ player, t }) {
 
       {/* Bunkers */}
       <Section title={t('scorecard.bunkers')}>
-        <StatRow label={t('scorecard.nearGreen')} value={totalBunkersNearGreen} />
-        <StatRow label={t('scorecard.fairway')} value={totalBunkersFairway} />
-        <StatRow label={t('scorecard.other')} value={totalBunkersOther} />
-        <StatRow label={t('scorecard.stats.total')} value={totalBunkers} bold />
+        <StatRow label={t('scorecard.nearGreen')} value={bunkersNearGreen} />
+        <StatRow label={t('scorecard.fairway')} value={bunkersFairway} />
+        <StatRow label={t('scorecard.other')} value={bunkersOther} />
+        <StatRow label={t('scorecard.stats.total')} value={bunkersNearGreen + bunkersFairway + bunkersOther} bold />
       </Section>
 
       {/* Penalties */}
       <Section title={t('scorecard.penalties')}>
-        <StatRow label={t('scorecard.water')} value={totalPenaltiesWater} />
-        <StatRow label={t('scorecard.oob')} value={totalPenaltiesOOB} />
-        <StatRow label={t('scorecard.other')} value={totalPenaltiesOther} />
-        <StatRow label={t('scorecard.stats.total')} value={totalPenalties} bold />
+        <StatRow label={t('scorecard.water')} value={penaltiesWater} />
+        <StatRow label={t('scorecard.oob')} value={penaltiesOOB} />
+        <StatRow label={t('scorecard.other')} value={penaltiesOther} />
+        <StatRow label={t('scorecard.stats.total')} value={penaltiesWater + penaltiesOOB + penaltiesOther} bold />
       </Section>
     </div>
   );

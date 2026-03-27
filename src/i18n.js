@@ -159,9 +159,9 @@ const resources = {
         stats: {
           holesPlayed: 'holes played',
           totalStrokes: 'Total strokes',
-          avgStrokes: 'Avg strokes / hole',
           totalPutts: 'Total putts',
           avgPutts: 'Avg putts / hole',
+          avgPoints: 'Avg pts / hole',
           total: 'Total',
           noData: 'No data recorded',
         },
@@ -356,9 +356,9 @@ const resources = {
         stats: {
           holesPlayed: 'hål spelade',
           totalStrokes: 'Totala slag',
-          avgStrokes: 'Snitt slag / hål',
           totalPutts: 'Totala puttar',
           avgPutts: 'Snitt puttar / hål',
+          avgPoints: 'Snitt poäng / hål',
           total: 'Totalt',
           noData: 'Ingen data registrerad',
         },
