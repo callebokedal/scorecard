@@ -38,16 +38,21 @@ export default function ClubsPage() {
           {clubs.map((club) => (
             <li key={club.id} className="bg-white rounded-xl shadow-sm border border-gray-100">
               <button
-                className="w-full text-left px-4 py-3"
+                className="w-full text-left px-4 py-3 flex items-center justify-between gap-3"
                 onClick={() => navigate(`/clubs/${club.id}`)}
               >
-                <div className="font-semibold text-gray-800">{club.name}</div>
-                {club.address && (
-                  <div className="text-sm text-gray-500 mt-0.5">{club.address}</div>
-                )}
-                <div className="text-xs text-gray-400 mt-1">
-                  {t('common.courseCount', { count: club.courses.length })}
+                <div className="min-w-0">
+                  <div className="font-semibold text-gray-800">{club.name}</div>
+                  {club.address && (
+                    <div className="text-sm text-gray-500 mt-0.5">{club.address}</div>
+                  )}
+                  <div className="text-xs text-green-700 font-medium mt-1">
+                    {t('common.courseCount', { count: club.courses.length })} · {t('clubs.manageCourses')}
+                  </div>
                 </div>
+                <svg className="shrink-0 text-gray-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m9 18 6-6-6-6"/>
+                </svg>
               </button>
               <div className="flex border-t border-gray-100">
                 <button
