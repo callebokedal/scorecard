@@ -126,6 +126,7 @@ export default function ScorecardDetailPage() {
                     holeInfo={holeInfo}
                     courseSlope={course?.slope ?? null}
                     courseHoles={course?.holes ?? 18}
+                    course={course}
                     expanded={expandedPlayerId === player.playerId}
                     onToggle={() => togglePlayer(player.playerId)}
                     onChange={(updates) => handleHoleChange(updates, player.playerId)}

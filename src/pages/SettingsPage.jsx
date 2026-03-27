@@ -11,7 +11,7 @@ import { saveScorecards, loadScorecards } from '../services/scorecards.service';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
-  const { theme, setTheme, language, setLanguage } = useSettingsStore();
+  const { theme, setTheme, language, setLanguage, fontSize, setFontSize } = useSettingsStore();
 
   return (
     <div className="p-4 max-w-lg mx-auto flex flex-col gap-6">
@@ -26,6 +26,19 @@ export default function SettingsPage() {
           ]}
           value={language}
           onChange={setLanguage}
+        />
+      </Section>
+
+      {/* Font size */}
+      <Section title={t('settings.fontSize')}>
+        <SegmentedControl
+          options={[
+            { value: 'small', label: t('settings.fontSizeSmall') },
+            { value: 'medium', label: t('settings.fontSizeMedium') },
+            { value: 'large', label: t('settings.fontSizeLarge') },
+          ]}
+          value={fontSize}
+          onChange={setFontSize}
         />
       </Section>
 

@@ -6,9 +6,9 @@ const SETTINGS_KEY = 'scorecard:settings';
 function load() {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw ? JSON.parse(raw) : { theme: 'light', language: 'en' };
+    return raw ? JSON.parse(raw) : { theme: 'light', language: 'en', fontSize: 'small' };
   } catch {
-    return { theme: 'light', language: 'en' };
+    return { theme: 'light', language: 'en', fontSize: 'small' };
   }
 }
 
@@ -24,14 +24,24 @@ function applyLanguage(language) {
   i18n.changeLanguage(language);
 }
 
+function applyFontSize(fontSize) {
+  if (fontSize === 'medium' || fontSize === 'large') {
+    document.documentElement.setAttribute('data-font-size', fontSize);
+  } else {
+    document.documentElement.removeAttribute('data-font-size');
+  }
+}
+
 const initial = load();
 // Apply persisted settings immediately on module load
 applyTheme(initial.theme);
 applyLanguage(initial.language);
+applyFontSize(initial.fontSize);
 
 export const useSettingsStore = create((set, get) => ({
   theme: initial.theme,
   language: initial.language,
+  fontSize: initial.fontSize ?? 'small',
 
   setTheme: (theme) => {
     applyTheme(theme);
@@ -43,5 +53,11 @@ export const useSettingsStore = create((set, get) => ({
     applyLanguage(language);
     save({ ...get(), language });
     set({ language });
+  },
+
+  setFontSize: (fontSize) => {
+    applyFontSize(fontSize);
+    save({ ...get(), fontSize });
+    set({ fontSize });
   },
 }));

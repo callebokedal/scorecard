@@ -156,7 +156,7 @@ export function Leaderboard({ scorecard, course }) {
               <tr key={row.player.playerId} className="border-t border-gray-100">
                 <td className="px-3 py-2.5 text-gray-400 font-medium">{idx + 1}</td>
                 <td className="px-3 py-2.5">
-                  <div className="font-semibold text-gray-800">{row.player.name}</div>
+                  <div className="font-semibold text-base text-gray-800">{row.player.name}</div>
                   <div className="text-xs text-gray-400">HCP {Number(row.player.hcp).toFixed(1)}</div>
                 </td>
                 <td className="px-3 py-2.5 text-center font-bold text-gray-900 tabular-nums">
@@ -251,8 +251,8 @@ export function Leaderboard({ scorecard, course }) {
               <tr key={row.player.playerId} className="border-t border-gray-100">
                 <td className="px-3 py-2 sticky left-0 bg-white">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-xs text-gray-400 font-medium tabular-nums">{idx + 1}</span>
-                    <span className="font-semibold text-gray-800">{row.player.name}</span>
+                    <span className="text-base text-gray-400 font-medium tabular-nums">{idx + 1}</span>
+                    <span className="font-semibold text-base text-gray-800">{row.player.name}</span>
                   </div>
                   <div className="text-xs text-gray-400">
                     HCP {Number(row.player.hcp).toFixed(1)}
@@ -275,7 +275,7 @@ export function Leaderboard({ scorecard, course }) {
                     <td key={hole.holeNumber} className="px-1 py-1.5 text-center tabular-nums">
                       {hole.strokes != null ? (
                         <div className="flex flex-col items-center gap-0.5">
-                          <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-bold ${
+                          <span className={`inline-flex items-center justify-center w-7 h-7 text-base font-bold ${
                             displayDiff == null  ? 'text-gray-500'
                             : displayDiff <= -3  ? 'rounded-full bg-green-600 text-white ring-2 ring-green-700 ring-offset-1'
                             : displayDiff === -2 ? 'rounded-full bg-green-600 text-white ring-2 ring-green-700 ring-offset-1'
@@ -287,11 +287,11 @@ export function Leaderboard({ scorecard, course }) {
                           }`}>
                             {hole.strokes}
                           </span>
-                          <span className="text-[10px] mt-1 font-medium text-green-700 leading-none">
+                          <span className="text-[12px] mt-1 font-medium text-green-700 leading-none">
                             {points ?? 0}p
                           </span>
                           {hcpStrokes > 0 && (
-                            <span className="text-[10px] text-gray-400 leading-none">
+                            <span className="text-[12px] text-gray-400 leading-none">
                               {'·'.repeat(hcpStrokes)}
                             </span>
                           )}

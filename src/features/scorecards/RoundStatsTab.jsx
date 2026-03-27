@@ -95,11 +95,23 @@ function PlayerStats({ player, course, t }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Player header */}
-      <div className="px-4 py-3 bg-green-700">
-        <div className="font-semibold text-white">{player.name}</div>
-        <div className="text-xs text-green-200 mt-0.5">
-          HCP {Number(player.hcp).toFixed(1)} · {played.length}/{player.holes.length} {t('scorecard.stats.holesPlayed')}
+      <div className="px-4 py-3 bg-green-700 flex items-center justify-between">
+        <div>
+          <div className="font-semibold text-lg text-white">{player.name}</div>
+          <div className="text-xs text-green-200 mt-0.5">
+            HCP {Number(player.hcp).toFixed(1)} · {played.length}/{player.holes.length} {t('scorecard.stats.holesPlayed')}
+          </div>
         </div>
+        {pointsHoles > 0 && (() => {
+          const diff = totalPoints - pointsHoles * 2;
+          const diffStr = diff > 0 ? `+${diff}` : diff === 0 ? 'E' : `${diff}`;
+          return (
+            <div className="text-right">
+              <div className="text-lg font-bold text-white tabular-nums">{totalPoints}p</div>
+              <div className="text-xs text-green-200 tabular-nums">{diffStr}</div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Scoring */}
@@ -121,7 +133,7 @@ function PlayerStats({ player, course, t }) {
             {/* Overall direction summary */}
             <div className="flex gap-3 flex-wrap mb-3">
               {TEE_DIRECTIONS.map((dir) => teeCounts[dir] > 0 && (
-                <span key={dir} className="flex items-center gap-1 text-sm">
+                <span key={dir} className="flex items-center gap-1 text-base">
                   <span className={`font-bold ${DIR_COLOR[dir]}`}>{DIR_LABEL[dir]}</span>
                   <span className="text-gray-700 tabular-nums">{teeCounts[dir]}</span>
                 </span>
@@ -133,10 +145,10 @@ function PlayerStats({ player, course, t }) {
               <div className="flex flex-col gap-1.5 pt-2 border-t border-gray-100">
                 {clubEntries.map(([club, counts]) => (
                   <div key={club} className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-gray-600 w-10 shrink-0">{club}</span>
+                    <span className="text-sm font-semibold text-gray-600 w-10 shrink-0">{club}</span>
                     <div className="flex gap-2 flex-wrap">
                       {TEE_DIRECTIONS.map((dir) => counts[dir] > 0 && (
-                        <span key={dir} className="flex items-center gap-0.5 text-xs">
+                        <span key={dir} className="flex items-center gap-0.5 text-sm">
                           <span className={`font-bold ${DIR_COLOR[dir]}`}>{DIR_LABEL[dir]}</span>
                           <span className="text-gray-600 tabular-nums">{counts[dir]}</span>
                         </span>
@@ -199,12 +211,12 @@ function CompactStatRow({ items, total }) {
       <div className="flex gap-3 flex-wrap">
         {items.map(({ label, value }) => (
           <span key={label} className="text-sm text-gray-600">
-            {label} <span className="font-semibold text-gray-800 tabular-nums">{value}</span>
+            {label} <span className="text-base font-semibold text-gray-800 tabular-nums">{value}</span>
           </span>
         ))}
       </div>
       <span className="text-sm font-bold text-gray-900 tabular-nums shrink-0">
-        {t('scorecard.stats.total')} {total}
+        {t('scorecard.stats.total')} <span className="text-base">{total}</span>
       </span>
     </div>
   );
@@ -214,7 +226,7 @@ function StatRow({ label, value, bold, highlight }) {
   return (
     <div className="flex items-center justify-between py-1">
       <span className="text-sm text-gray-600">{label}</span>
-      <span className={`text-sm tabular-nums ${
+      <span className={`text-base tabular-nums ${
         bold ? 'font-bold text-gray-900'
         : highlight ? 'font-semibold text-green-700'
         : 'text-gray-800'

@@ -5,6 +5,7 @@ import {
   calcPlayingHcp,
   hcpStrokesOnHole,
   calcStablefordPoints,
+  computePlayerTotals,
 } from '../../utils/scorecard.utils';
 
 /**
@@ -15,6 +16,7 @@ import {
  * @param {import('../../types/models').HoleInfo|null} props.holeInfo - null if no course selected
  * @param {number|null} props.courseSlope
  * @param {number} [props.courseHoles] - Total holes on the course (9 or 18), used for HCP distribution
+ * @param {import('../../types/models').Course|null} [props.course]
  * @param {boolean} props.expanded
  * @param {() => void} props.onToggle
  * @param {(updates: Partial<import('../../types/models').HoleScore>) => void} props.onChange
@@ -26,6 +28,7 @@ export function PlayerAccordion({
   holeInfo,
   courseSlope,
   courseHoles = 18,
+  course = null,
   expanded,
   onToggle,
   onChange,
@@ -35,6 +38,8 @@ export function PlayerAccordion({
 
   const playingHcp =
     courseSlope != null ? calcPlayingHcp(player.hcp, courseSlope) : null;
+
+  const totals = computePlayerTotals(player, course);
 
   const hcpStrokes =
     playingHcp != null && holeInfo
@@ -56,7 +61,18 @@ export function PlayerAccordion({
           onClick={onToggle}
         >
           <div className="flex items-center gap-2 min-w-0">
-            <span className="font-semibold text-white truncate">{player.name}</span>
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-base text-white truncate">{player.name}</span>
+              {totals.thru > 0 && course && (() => {
+                const diff = totals.totalPoints - totals.thru * 2;
+                const diffStr = diff > 0 ? `+${diff}` : diff === 0 ? 'E' : `${diff}`;
+                return (
+                  <span className="text-xs text-green-200 tabular-nums">
+                    {totals.totalPoints}p {diffStr}
+                  </span>
+                );
+              })()}
+            </div>
             {hasMissingScores && (
               <svg className="shrink-0 text-amber-300" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             )}
