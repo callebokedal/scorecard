@@ -55,10 +55,12 @@ export function PlayerAccordion({
     <>
       <div className="bg-white shadow-sm border border-gray-100 overflow-hidden">
         {/* Header */}
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           className="w-full flex items-center justify-between px-4 py-3 text-left bg-green-700 cursor-pointer"
           onClick={onToggle}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onToggle()}
         >
           <div className="flex items-center gap-2 min-w-0">
             <div className="flex flex-col min-w-0">
@@ -113,7 +115,7 @@ export function PlayerAccordion({
               ▾
             </span>
           </div>
-        </button>
+        </div>
 
         {/* Body */}
         {expanded && (

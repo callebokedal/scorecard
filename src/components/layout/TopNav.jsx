@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next';
  * Top navigation bar with title and hamburger menu.
  * @param {object} props
  * @param {string} [props.title] - Override the default app title
+ * @param {string} [props.subtitle] - Smaller text shown below the title
  * @param {React.ReactNode} [props.leftAction] - Element rendered on the left (e.g. back arrow)
  */
-export function TopNav({ title, leftAction }) {
+export function TopNav({ title, subtitle, leftAction }) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -35,9 +36,14 @@ export function TopNav({ title, leftAction }) {
         </div>
 
         {/* Center: title */}
-        <span className="font-semibold text-lg tracking-wide">
-          {title ?? t('nav.title')}
-        </span>
+        <div className="flex flex-col items-center">
+          <span className="font-semibold text-lg tracking-wide leading-tight">
+            {title ?? t('nav.title')}
+          </span>
+          {subtitle && (
+            <span className="text-xs text-green-200 leading-tight">{subtitle}</span>
+          )}
+        </div>
 
         {/* Right: hamburger */}
         <button

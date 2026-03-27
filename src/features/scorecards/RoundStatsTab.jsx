@@ -93,7 +93,7 @@ function PlayerStats({ player, course, t }) {
   const penaltiesOther = player.holes.reduce((s, h) => s + (h.penaltiesOther ?? 0), 0);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className="bg-white mb-4 rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Player header */}
       <div className="px-4 py-3 bg-green-700 flex items-center justify-between">
         <div>

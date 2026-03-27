@@ -114,7 +114,7 @@ export function Leaderboard({ scorecard, course }) {
   }[orientation];
 
   return (
-    <div className="p-4 max-w-5xl mx-auto">
+    <div className="p-4 max-w-5xl mx-auto mb-4">
       {/* Toolbar */}
       <div className="flex justify-end gap-2 mb-3">
         <button

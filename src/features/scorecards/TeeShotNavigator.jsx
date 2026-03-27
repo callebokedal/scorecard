@@ -114,13 +114,14 @@ export function TeeShotNavigator({ value, onChange, club, onClubChange }) {
             <button
               type="button"
               onClick={() => select('hit')}
-              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full ring-2 cursor-pointer z-10 text-sm font-semibold transition-colors ${
+              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full ring-2 cursor-pointer z-10 font-semibold transition-colors flex flex-col items-center justify-center leading-tight ${
                 value === 'hit'
                   ? 'bg-green-600 text-white ring-green-700'
                   : 'bg-white text-gray-700 ring-gray-300 hover:bg-gray-50'
               }`}
             >
-              {t('scorecard.hit').toUpperCase()}
+              <span className="text-xs">{t('scorecard.hit').toUpperCase()}</span>
+              <span className="text-xs">✓</span>
             </button>
           </div>
 

@@ -82,7 +82,7 @@ export default function ScorecardDetailPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <TopNav title={`${sc.name} · ${formatDate(sc.date)}`} leftAction={backBtn} />
+      <TopNav title={sc.name} subtitle={formatDate(sc.date)} leftAction={backBtn} />
 
       {/* Tab bar */}
       <div className="flex bg-white border-b border-gray-200 shadow-sm">
