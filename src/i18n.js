@@ -164,6 +164,7 @@ const resources = {
           avgPoints: 'Avg pts / hole',
           total: 'Total',
           noData: 'No data recorded',
+          unknownClub: 'Unknown',
         },
         lb: {
           rank: '#',
@@ -361,6 +362,7 @@ const resources = {
           avgPoints: 'Snitt poäng / hål',
           total: 'Totalt',
           noData: 'Ingen data registrerad',
+          unknownClub: 'Okänd',
         },
         lb: {
           rank: '#',

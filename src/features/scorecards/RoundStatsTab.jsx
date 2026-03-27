@@ -63,14 +63,24 @@ function PlayerStats({ player, course, t }) {
 
   // Per-club breakdown: { clubName: { hit, long, short, left, right, miss } }
   const clubStats = {};
+  const unknownCounts = Object.fromEntries(TEE_DIRECTIONS.map((d) => [d, 0]));
+  let hasUnknown = false;
   player.holes.forEach((h) => {
-    if (!h.teeClub || !h.teeShot) return;
-    if (!clubStats[h.teeClub]) clubStats[h.teeClub] = Object.fromEntries(TEE_DIRECTIONS.map((d) => [d, 0]));
-    if (h.teeShot in clubStats[h.teeClub]) clubStats[h.teeClub][h.teeShot]++;
+    if (!h.teeShot) return;
+    if (h.teeClub) {
+      if (!clubStats[h.teeClub]) clubStats[h.teeClub] = Object.fromEntries(TEE_DIRECTIONS.map((d) => [d, 0]));
+      if (h.teeShot in clubStats[h.teeClub]) clubStats[h.teeClub][h.teeShot]++;
+    } else {
+      if (h.teeShot in unknownCounts) { unknownCounts[h.teeShot]++; hasUnknown = true; }
+    }
   });
   const clubEntries = Object.entries(clubStats).sort(
     (a, b) => Object.values(b[1]).reduce((s, v) => s + v, 0) - Object.values(a[1]).reduce((s, v) => s + v, 0)
   );
+  // Only show unknown row if there are known clubs to compare against
+  if (hasUnknown && clubEntries.length > 0) {
+    clubEntries.push([t('scorecard.stats.unknownClub'), unknownCounts]);
+  }
 
   // Bunkers
   const bunkersNearGreen = player.holes.reduce((s, h) => s + (h.bunkersNearGreen ?? 0), 0);
@@ -142,18 +152,20 @@ function PlayerStats({ player, course, t }) {
 
       {/* Bunkers */}
       <Section title={t('scorecard.bunkers')}>
-        <StatRow label={t('scorecard.nearGreen')} value={bunkersNearGreen} />
-        <StatRow label={t('scorecard.fairway')} value={bunkersFairway} />
-        <StatRow label={t('scorecard.other')} value={bunkersOther} />
-        <StatRow label={t('scorecard.stats.total')} value={bunkersNearGreen + bunkersFairway + bunkersOther} bold />
+        <CompactStatRow items={[
+          { label: t('scorecard.nearGreen'), value: bunkersNearGreen },
+          { label: t('scorecard.fairway'), value: bunkersFairway },
+          { label: t('scorecard.other'), value: bunkersOther },
+        ]} total={bunkersNearGreen + bunkersFairway + bunkersOther} />
       </Section>
 
       {/* Penalties */}
       <Section title={t('scorecard.penalties')}>
-        <StatRow label={t('scorecard.water')} value={penaltiesWater} />
-        <StatRow label={t('scorecard.oob')} value={penaltiesOOB} />
-        <StatRow label={t('scorecard.other')} value={penaltiesOther} />
-        <StatRow label={t('scorecard.stats.total')} value={penaltiesWater + penaltiesOOB + penaltiesOther} bold />
+        <CompactStatRow items={[
+          { label: t('scorecard.water'), value: penaltiesWater },
+          { label: t('scorecard.oob'), value: penaltiesOOB },
+          { label: t('scorecard.other'), value: penaltiesOther },
+        ]} total={penaltiesWater + penaltiesOOB + penaltiesOther} />
       </Section>
     </div>
   );
@@ -175,6 +187,29 @@ function Section({ title, children }) {
  * @param {boolean} [props.bold]
  * @param {boolean} [props.highlight]
  */
+/**
+ * @param {object} props
+ * @param {{ label: string, value: number }[]} props.items
+ * @param {number} props.total
+ */
+function CompactStatRow({ items, total }) {
+  const { t } = useTranslation();
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <div className="flex gap-3 flex-wrap">
+        {items.map(({ label, value }) => (
+          <span key={label} className="text-sm text-gray-600">
+            {label} <span className="font-semibold text-gray-800 tabular-nums">{value}</span>
+          </span>
+        ))}
+      </div>
+      <span className="text-sm font-bold text-gray-900 tabular-nums shrink-0">
+        {t('scorecard.stats.total')} {total}
+      </span>
+    </div>
+  );
+}
+
 function StatRow({ label, value, bold, highlight }) {
   return (
     <div className="flex items-center justify-between py-1">
