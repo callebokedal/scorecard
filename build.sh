@@ -21,3 +21,10 @@ if [[ "$confirm_commit" != "y" && "$confirm_commit" != "Y" ]]; then
 fi
 
 git cm "New build"
+
+
+read -rp "Push? [y/N] " confirm_push
+if [[ "$confirm_push" != "y" && "$confirm_commit" != "Y" ]]; then
+  echo "Aborted."
+  exit 1
+fi
