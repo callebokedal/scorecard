@@ -70,7 +70,7 @@
  * @typedef {object} HoleScore
  * @property {number} holeNumber - 1-based
  * @property {number|null} strokes - Gross strokes (null = not yet entered)
- * @property {number} putts
+ * @property {number|null} putts - null = not yet entered
  * @property {TeeShot|null} teeShot - 'hit'|'left'|'right'|'long'|'short'|'miss'|null
  * @property {TeeClub|null} teeClub - club used on tee, null if not recorded
  * @property {boolean} skipped - true if the hole was deliberately skipped

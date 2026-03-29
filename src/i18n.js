@@ -166,6 +166,8 @@ const resources = {
           total: 'Total',
           noData: 'No data recorded',
           unknownClub: 'Unknown',
+          pointsPerHole: 'Points / hole',
+          puttsPerHole: 'Putts / hole',
         },
         lb: {
           rank: '#',
@@ -399,6 +401,8 @@ const resources = {
           total: 'Totalt',
           noData: 'Ingen data registrerad',
           unknownClub: 'Okänd',
+          pointsPerHole: 'Poäng / hål',
+          puttsPerHole: 'Puttar / hål',
         },
         lb: {
           rank: '#',

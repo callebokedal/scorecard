@@ -9,7 +9,7 @@ export function createInitialHoleScores(holesPlayed, startHole = 1) {
     holeNumber: startHole + i,
     strokes: null,
     skipped: false,
-    putts: 0,
+    putts: null,
     teeShot: null,
     teeClub: null,
     bunkersNearGreen: 0,

@@ -38,8 +38,9 @@ function PlayerStats({ player, course, t }) {
 
   const played = player.holes.filter((h) => h.strokes != null);
   const totalStrokes = played.reduce((s, h) => s + h.strokes, 0);
-  const totalPutts = played.reduce((s, h) => s + (h.putts ?? 0), 0);
-  const avgPutts = played.length ? (totalPutts / played.length).toFixed(1) : '—';
+  const playedWithPutts = played.filter((h) => h.putts != null);
+  const totalPutts = playedWithPutts.reduce((s, h) => s + h.putts, 0);
+  const avgPutts = playedWithPutts.length ? (totalPutts / playedWithPutts.length).toFixed(1) : '—';
 
   // Points per hole (requires course)
   let totalPoints = 0;
@@ -55,6 +56,18 @@ function PlayerStats({ player, course, t }) {
     }
   }
   const avgPoints = pointsHoles ? (totalPoints / pointsHoles).toFixed(2) : null;
+
+  // Sparkline data — holes in order, only those with strokes
+  const sparkHoles = [...played].sort((a, b) => a.holeNumber - b.holeNumber);
+  const pointsSparkline = course
+    ? sparkHoles.flatMap((h) => {
+        const info = course.holeInfo.find((hi) => hi.holeNumber === h.holeNumber);
+        if (!info) return [];
+        const hcpStrokes = hcpStrokesOnHole(playingHcp, info.slopeIndex, course.holes);
+        return [calcStablefordPoints(h.strokes, info.par, hcpStrokes)];
+      })
+    : [];
+  const puttsSparkline = sparkHoles.map((h) => h.putts ?? null);
 
   // Tee shots
   const teeShotHoles = player.holes.filter((h) => h.teeShot != null);
@@ -122,6 +135,25 @@ function PlayerStats({ player, course, t }) {
         {avgPoints !== null && (
           <StatRow label={t('scorecard.stats.avgPoints')} value={avgPoints} highlight />
         )}
+        {pointsSparkline.length >= 2 && (
+          <div className="mt-3">
+            <div className="text-xs text-gray-400 mb-1">{t('scorecard.stats.pointsPerHole')}</div>
+            <Sparkline
+              values={pointsSparkline}
+              refValue={2}
+              dotColor={(v) => v >= 3 ? '#16a34a' : v === 2 ? '#6b7280' : v === 1 ? '#f59e0b' : '#ef4444'}
+            />
+          </div>
+        )}
+        {puttsSparkline.filter((v) => v != null).length >= 2 && (
+          <div className="mt-2">
+            <div className="text-xs text-gray-400 mb-1">{t('scorecard.stats.puttsPerHole')}</div>
+            <Sparkline
+              values={puttsSparkline}
+              dotColor={(v) => v <= 1 ? '#16a34a' : v === 2 ? '#6b7280' : '#ef4444'}
+            />
+          </div>
+        )}
       </Section>
 
       {/* Tee shots */}
@@ -180,6 +212,57 @@ function PlayerStats({ player, course, t }) {
         ]} total={penaltiesWater + penaltiesOOB + penaltiesOther} />
       </Section>
     </div>
+  );
+}
+
+const SL_W = 300;
+const SL_H = 48;
+const SL_PAD = 6;
+
+function Sparkline({ values, refValue, dotColor }) {
+  const nonNull = values.filter((v) => v != null);
+  if (nonNull.length < 2) return null;
+  const allVals = refValue != null ? [...nonNull, refValue] : nonNull;
+  const min = Math.min(...allVals) - 0.5;
+  const max = Math.max(...allVals) + 0.5;
+  const range = max - min || 1;
+  const toX = (i) => SL_PAD + (i / (values.length - 1)) * (SL_W - SL_PAD * 2);
+  const toY = (v) => SL_PAD + (1 - (v - min) / range) * (SL_H - SL_PAD * 2);
+  const nullY = SL_H - SL_PAD;
+
+  // Build line segments, breaking on null
+  const segments = [];
+  let seg = [];
+  values.forEach((v, i) => {
+    if (v != null) {
+      seg.push(`${toX(i)},${toY(v)}`);
+    } else {
+      if (seg.length >= 2) segments.push(seg.join(' '));
+      seg = [];
+    }
+  });
+  if (seg.length >= 2) segments.push(seg.join(' '));
+
+  return (
+    <svg viewBox={`0 0 ${SL_W} ${SL_H}`} className="w-full" style={{ height: 48 }}>
+      {refValue != null && (
+        <line x1={SL_PAD} y1={toY(refValue)} x2={SL_W - SL_PAD} y2={toY(refValue)}
+          stroke="#d1d5db" strokeWidth="1.5" strokeDasharray="4,3" />
+      )}
+      {segments.map((pts, i) => (
+        <polyline key={i} points={pts} fill="none" stroke="#9ca3af" strokeWidth="1.5"
+          strokeLinejoin="round" strokeLinecap="round" />
+      ))}
+      {values.map((v, i) =>
+        v != null ? (
+          <circle key={i} cx={toX(i)} cy={toY(v)} r="3.5"
+            fill={dotColor ? dotColor(v) : '#6b7280'} />
+        ) : (
+          <circle key={i} cx={toX(i)} cy={nullY} r="3.5"
+            fill="white" stroke="#d1d5db" strokeWidth="1.5" />
+        )
+      )}
+    </svg>
   );
 }
 

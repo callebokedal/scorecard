@@ -34,6 +34,7 @@ export function HoleEntryForm({ holeScore, onChange, onStrokeClick }) {
           value={h.putts}
           min={0}
           max={10}
+          nullable
           onChange={(v) => onChange({ putts: v })}
         />
       </div>

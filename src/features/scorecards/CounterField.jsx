@@ -6,10 +6,11 @@
  * @param {(v: number) => void} props.onChange
  * @param {number} [props.min]
  * @param {number} [props.max]
+ * @param {boolean} [props.nullable] - When true, decrementing below min sets value to null
  * @param {() => void} [props.onSkip] - When provided, shows a skip (—) button to the left of minus
  * @param {() => void} [props.onValueClick] - When provided, the value is tappable (e.g. opens a quick-entry modal)
  */
-export function CounterField({ label, value, onChange, min = 0, max = 99, onSkip, onValueClick }) {
+export function CounterField({ label, value, onChange, min = 0, max = 99, nullable = false, onSkip, onValueClick }) {
   const display = value == null ? '—' : value;
   const isSkipped = value == null;
 
@@ -32,8 +33,8 @@ export function CounterField({ label, value, onChange, min = 0, max = 99, onSkip
         )}
         <button
           type="button"
-          onClick={() => onChange(Math.max(min, (value ?? 0) - 1))}
-          disabled={isSkipped || value <= min}
+          onClick={() => nullable && value === min ? onChange(null) : onChange(Math.max(min, (value ?? 0) - 1))}
+          disabled={isSkipped || value == null || (value <= min && !nullable)}
           className="w-10 h-10 rounded-full bg-gray-100 text-gray-600 text-xl font-semibold flex items-center justify-center hover:bg-gray-200 active:scale-95 disabled:opacity-30 transition-transform cursor-pointer"
         >
           −
