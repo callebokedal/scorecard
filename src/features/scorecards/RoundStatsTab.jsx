@@ -136,8 +136,8 @@ function PlayerStats({ player, course, t }) {
           <StatRow label={t('scorecard.stats.avgPoints')} value={avgPoints} highlight />
         )}
         {pointsSparkline.length >= 2 && (
-          <div className="mt-3">
-            <div className="text-xs text-gray-400 mb-1">{t('scorecard.stats.pointsPerHole')}</div>
+          <div className="mt-1">
+            <div className="text-sm text-gray-600 mb-1">{t('scorecard.stats.pointsPerHole')}</div>
             <Sparkline
               values={pointsSparkline}
               refValue={2}
@@ -146,8 +146,8 @@ function PlayerStats({ player, course, t }) {
           </div>
         )}
         {puttsSparkline.filter((v) => v != null).length >= 2 && (
-          <div className="mt-2">
-            <div className="text-xs text-gray-400 mb-1">{t('scorecard.stats.puttsPerHole')}</div>
+          <div className="mt-1">
+            <div className="text-sm text-gray-600 mb-1">{t('scorecard.stats.puttsPerHole')}</div>
             <Sparkline
               values={puttsSparkline}
               dotColor={(v) => v <= 1 ? '#16a34a' : v === 2 ? '#6b7280' : '#ef4444'}
