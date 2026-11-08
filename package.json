@@ -10,11 +10,11 @@
   },
   "dependencies": {
     "i18next": "^24.0.0",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.2.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-i18next": "^15.0.0",
-    "react-router-dom": "^7.5.0",
+    "react-router-dom": "^7.18.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
